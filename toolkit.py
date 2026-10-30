@@ -147,7 +147,10 @@ def money(value):
 
 
 def doctor():
-    return {'version': VERSION, 'os': platform.system(), 'architecture': platform.machine(),
+    system_name = {'win32': 'Windows', 'darwin': 'Darwin', 'linux': 'Linux'}.get(sys.platform, sys.platform)
+    architecture = os.uname().machine if hasattr(os, 'uname') else os.environ.get('PROCESSOR_ARCHITEW6432', os.environ.get('PROCESSOR_ARCHITECTURE', 'unknown'))
+    return {'version': VERSION, 'os': system_name, 'architecture': architecture,
+            'architecture_basis': 'native-uname' if hasattr(os, 'uname') else 'environment-declared',
             'python': platform.python_version(), 'supported_python': sys.version_info >= (3, 11),
             'tools': {name: shutil.which(name) is not None for name in ('claude', 'git', 'gh', 'node', 'pwsh')},
             'account': 'not-checked', 'billing': 'unknown', 'mutations': []}
