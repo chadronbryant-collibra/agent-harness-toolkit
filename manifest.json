@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "name": "agent-harness-toolkit",
+  "version": "0.1.0",
+  "python": ">=3.11",
+  "platform_targets": ["windows-x64", "windows-arm64", "macos-arm64", "macos-x64"],
+  "runtime_dependencies": [],
+  "distribution": "private-colleague-edition",
+  "public_release": false,
+  "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance"],
+  "compatibility": {"source_tests": "42-passed-macos-arm64-python3.14", "windows_runtime": "pending", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "pending", "human_acceptance": "pending"}
+}

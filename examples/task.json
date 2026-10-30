@@ -1,0 +1,7 @@
+{
+  "origin": "user",
+  "class": "implementation",
+  "effect": "local-write",
+  "objective": "Create an action plan from the three synthetic sections in examples/notes.md without editing the notes.",
+  "acceptance": ["Every action cites a source note", "Source notes remain unchanged", "Uncertain owners are marked unknown"]
+}
