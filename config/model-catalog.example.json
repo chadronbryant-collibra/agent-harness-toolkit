@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "purpose": "Template only; verify actual account, deployment and pricing during setup",
+  "reviewed_at": "2026-10-30",
+  "review_days": 30,
+  "official_source": "https://code.claude.com/docs/en/model-config",
+  "surface": null,
+  "account_verified": false,
+  "models": [
+    {"role":"fast","candidate":"haiku","observed_runtime_id":null,"available":null,"input_usd_per_million":null,"output_usd_per_million":null},
+    {"role":"standard","candidate":"sonnet","observed_runtime_id":null,"available":null,"input_usd_per_million":null,"output_usd_per_million":null},
+    {"role":"deep","candidate":"opus","observed_runtime_id":null,"available":null,"input_usd_per_million":null,"output_usd_per_million":null}
+  ],
+  "change_policy": "Review one mapping at a time against the same representative tasks; retain previous revision"
+}

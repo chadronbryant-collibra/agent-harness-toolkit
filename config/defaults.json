@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "profile": {"name": "My workspace", "billing": "unknown", "currency": "USD"},
+  "models": {
+    "fast": {"id": "haiku", "effort": "low", "verified": false},
+    "standard": {"id": "sonnet", "effort": "medium", "verified": false},
+    "deep": {"id": "opus", "effort": "high", "verified": false}
+  },
+  "budgets": {"task_usd": 1.0, "month_usd": 20.0, "max_concurrency": 1},
+  "autonomy": {"max_cycles": 3, "max_retries": 1, "timeout_seconds": 300, "external_writes": false},
+  "memory": {"enabled": false, "storage": "local-plaintext", "max_results": 5, "max_chars": 12000},
+  "references": {"review_days": 90},
+  "permissions": {"allowed_effects": ["read", "local-write"]}
+}
