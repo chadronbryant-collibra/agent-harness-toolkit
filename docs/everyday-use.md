@@ -1,30 +1,58 @@
-# Everyday work
+# Get useful work done with Claude
 
-Give Claude an observable outcome, sources, exact write scope, acceptance checks,
-budget and stopping condition. Example: “Create a project brief from these three
-notes. Keep notes unchanged. Every action needs a source. Finish the draft and
-verify coverage; ask only if a missing fact changes the result.”
+**Tell Claude what you want to finish, give it the right sources, and agree what a good result looks like.** You can do this in ordinary language.
 
-Use an advisory request for options before committing: “Assess these approaches,
-rank by evidence, cost and maintenance, and recommend one. Do not implement yet.”
+[← All guides](README.md) · [Models and cost →](models-and-cost.md)
 
-For a larger authorized task: “Implement this in an isolated worktree. Use one
-read-only reviewer if useful. Own integration and verification. Stop if the named
-budget or scope would be exceeded.” Verify actual client roles and model support.
-Subagents cost tokens too; sequential dependent work usually stays inline.
+## Start with a real outcome
 
-Create a task record with `task --input examples/task.json`. Save progress with
-`checkpoint --id <id> --status working --evidence "Source pointers and remaining checks"`.
-Valid transitions are planned→working/blocked, working→working/blocked/verified,
-blocked→working, verified→delivered. Working cycles are bounded. Evidence text is
-executor-declared. Use private relative pointers, never secret bodies. `agents`
-lists known records; it does not establish live process ownership.
+“Help with this project” leaves a lot for Claude to guess. A clearer request names the result and the information it should use.
 
-To resume, read the exact checkpoint and current artifacts. Preserve objective,
-authority, completed work, owned files and unresolved effects. Reconcile uncertain
-writes or process state before retrying. An unchanged denial ends that route.
+> Create a one-page project brief from these three notes. Keep the notes unchanged. Include the purpose, decisions, next actions and anything still unclear. Show where each action came from.
 
-After useful work: “Review this selected outcome for one reusable improvement.
-Separate observation, cause hypothesis, fix, reproduction and verification. Apply
-already-authorized fixes; propose changes to permission/budget/memory policy.”
-Use skills/harness/SKILL.md. Do not convert every conversation into durable memory.
+You do not need to prescribe every step. Give Claude enough context to make routine decisions and finish the work.
+
+## Choose the kind of help you want
+
+| If you need… | You can say… |
+| :--- | :--- |
+| Advice before deciding | “Compare these options, explain the tradeoffs, and recommend one. Wait before making changes.” |
+| A finished draft | “Create the draft, check it against these sources, and bring me the result.” |
+| Help carrying out a change | “Make this change in the files we agreed. Check the result and explain anything still unresolved.” |
+| Another pair of eyes | “If it would help, use one reviewer with a clear task. Check its findings before changing the work.” |
+
+An agent is another assistant given a specific piece of work. It can help with an independent review or a separate task, but it adds cost and coordination. Small tasks usually stay with the current Claude session.
+
+## Give the work a finish line
+
+Before a larger task, agree on:
+
+- **The result:** what you want to receive.
+- **The sources:** which files or information Claude should use.
+- **The changes:** what it may edit, and what it must preserve.
+- **The checks:** how you will know the result is right.
+- **The limits:** when it should stop because of cost, missing information or a decision only you can make.
+
+Claude should continue through the agreed steps without asking you to prompt every routine action. It should ask when a missing fact would materially change the result or require permission you have not given.
+
+## Pick up where you left off
+
+Before stopping a longer task, say:
+
+> Save a short progress note with the goal, decisions, files changed, checks completed and what remains. Include anything we need to inspect before trying again.
+
+When you return:
+
+> Read that progress note and the current files. Tell me what still needs doing, then continue within the same scope and budget.
+
+That progress note is a **checkpoint**. It helps a later session resume without rereading the whole conversation. It does not prove a background task has stopped or that a previous change succeeded.
+
+## Learn from a completed task
+
+> Review this result for one improvement we can reuse. Explain what happened, what supports your conclusion, and how we could check whether the change helps next time.
+
+Claude can fix already-approved problems. Changes to spending limits, permissions or what gets remembered need your agreement. A useful lesson is worth keeping; the whole conversation usually is not.
+
+**A good finish:** you have the result, know what was checked, and can see any remaining decision or limitation.
+
+[Need help with an interrupted task? Open Maintenance](maintenance.md#when-work-stops-unexpectedly).
