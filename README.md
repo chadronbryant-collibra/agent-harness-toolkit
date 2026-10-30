@@ -9,7 +9,7 @@ keeps useful context close, and carries tasks through to a finished result.
 
 **Windows & macOS · Guided setup with Claude · Choose what you need**
 
-[**↓ Download the toolkit**](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v0.1.0-preview.1/agent-harness-toolkit-0.1.0-colleague.zip) &nbsp; · &nbsp; [Setup guide](START-HERE.md) &nbsp; · &nbsp; [Explore the preview](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/tag/v0.1.0-preview.1)
+[**↓ Download the toolkit**](https://github.com/chadronbryant-collibra/agent-harness-toolkit/archive/refs/heads/main.zip) &nbsp; · &nbsp; [Setup guide](START-HERE.md) &nbsp; · &nbsp; [All guides](docs/README.md)
 
 </div>
 
@@ -21,9 +21,9 @@ You bring your work and preferences. The toolkit gives Claude a starting point f
 
 ### ① Download and unpack
 
-Use the ZIP you were sent, or [download the toolkit](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v0.1.0-preview.1/agent-harness-toolkit-0.1.0-colleague.zip). Extract it into a folder you plan to keep, such as **Documents → Agent Toolkit**.
+Use the ZIP you were sent, or [download the toolkit](https://github.com/chadronbryant-collibra/agent-harness-toolkit/archive/refs/heads/main.zip). Extract it into a folder you plan to keep, such as **Documents → Agent Toolkit**.
 
-Keep the whole folder together. You do not need to understand every file before you begin.
+Keep the whole folder together. You do not need to understand every file before you begin. The download above follows the current guides; older release ZIPs remain dated snapshots.
 
 ### ② Open it with Claude
 
