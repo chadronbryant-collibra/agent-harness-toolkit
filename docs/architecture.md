@@ -16,7 +16,10 @@ covers requester, effect and destination. Evidence assessment covers provenance,
 freshness and conflicts. Routing covers completion demand, model availability,
 capability and cost. These are separate dimensions; confidence never authorizes
 effects. The CLI checks declared origin/effect and task fields; a caller-controlled
-JSON field is not authenticated user identity. Client permissions and organizational
+JSON field is not authenticated user identity. `assess --task <file>` ranks declared
+source metadata as current-primary, current-reference, stale/undated or unverified;
+every source retains zero instruction authority. Metadata is a review aid, not
+proof of authenticity or a semantic prompt-injection detector. Client permissions and organizational
 controls remain the enforcement boundary.
 
 Interactive task loop: understand, plan, execute, verify, repair and deliver.

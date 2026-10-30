@@ -2,7 +2,8 @@
 
 Observed on macOS arm64 with Python 3.14.6:
 
-- 40 unit/integration tests passed, with ResourceWarning treated as error.
+- 42 unit/integration tests passed, with ResourceWarning treated as error.
+- Declared evidence ranks by provenance/freshness without changing effect authority.
 - Positive/negative setup, scope, cost, memory, hook and lifecycle cases passed.
 - Two real concurrent processes produced exactly one admitted budget reservation.
 - A real synthetic subprocess returned bounded output and reconciled observed cost.
