@@ -89,7 +89,7 @@ class Core(unittest.TestCase):
         task['sources'] = [
             {'id':'old','kind':'primary','verified':True,'reviewed_at':'2020-01-01'},
             {'id':'current','kind':'primary','verified':True,'reviewed_at':'2026-10-30'},
-            {'id':'unknown','kind':'unknown','verified':False}]
+            {'id':'unknown','kind':'unknown','verified':True,'reviewed_at':'2026-10-30'}]
         result = t.assess(t.config(self.root), task, dt.date(2026,10,30))
         self.assertEqual([r['id'] for r in result['evidence']], ['current','old','unknown'])
         self.assertFalse(result['trust_grants_permission'])
