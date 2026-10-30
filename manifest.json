@@ -8,5 +8,5 @@
   "distribution": "private-colleague-edition",
   "public_release": false,
   "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance"],
-  "compatibility": {"source_tests": "40-passed-macos-arm64-python3.14", "windows_runtime": "pending", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "pending", "human_acceptance": "pending"}
+  "compatibility": {"source_tests": "42-passed-macos-arm64-python3.14", "windows_runtime": "pending", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "pending", "human_acceptance": "pending"}
 }

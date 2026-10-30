@@ -252,6 +252,38 @@ def ledger(root):
     return value
 
 
+def assess(cfg, task, today=None):
+    """Rank declared evidence separately from user intent and permitted effects."""
+    selected = route(cfg, task)
+    today = today or dt.date.today()
+    sources = task.get('sources', [])
+    if not isinstance(sources, list) or len(sources) > 30:
+        raise HarnessError('invalid-source-list')
+    ranked = []
+    for source in sources:
+        source_id = source.get('id')
+        kind = source.get('kind')
+        if not isinstance(source_id, str) or not 1 <= len(source_id) <= 100 or kind not in ('primary', 'reference', 'unknown'):
+            raise HarnessError('invalid-source-metadata')
+        fresh = False
+        if source.get('reviewed_at'):
+            age = (today - dt.date.fromisoformat(source['reviewed_at'])).days
+            window = source.get('review_days', 30)
+            if type(window) is not int or not 1 <= window <= 365:
+                raise HarnessError('invalid-source-freshness')
+            fresh = 0 <= age <= window
+        verified = source.get('verified') is True
+        rank = 1 if verified and fresh and kind == 'primary' else (2 if verified and fresh and kind == 'reference' else (3 if verified and kind != 'unknown' else 4))
+        ranked.append({'id': source_id, 'rank': rank,
+                       'basis': ('current-primary' if rank == 1 else 'current-reference' if rank == 2 else 'stale-or-undated' if rank == 3 else 'unverified'),
+                       'instruction_authority': False, 'verification': 'caller-declared; inspect evidence'})
+    return {'intent': {'class': task['class'], 'outcome_present': True, 'acceptance_count': len(task['acceptance'])},
+            'authority': {'origin': 'user-declared', 'effect': task['effect'], 'destination_verified': False},
+            'evidence': sorted(ranked, key=lambda r: (r['rank'], r['id'])),
+            'coverage': 'declared-sources' if ranked else 'no-source-evidence-supplied',
+            'trust_grants_permission': False, 'route': selected, 'executes': False}
+
+
 def reserve(root, amount, period=None):
     cfg = config(root)
     period = period or now()[:7]
@@ -553,6 +585,7 @@ def main(argv=None):
         sub.add_parser(name)
     p = sub.add_parser('init'); p.add_argument('--apply-plan')
     p = sub.add_parser('route'); p.add_argument('--task', required=True)
+    p = sub.add_parser('assess'); p.add_argument('--task', required=True)
     p = sub.add_parser('reserve'); p.add_argument('--usd', required=True, type=float)
     p = sub.add_parser('reconcile'); p.add_argument('--id', required=True); p.add_argument('--actual-usd', type=float); p.add_argument('--not-started', action='store_true')
     p = sub.add_parser('memory'); p.add_argument('action', choices=['remember', 'search', 'forget']); p.add_argument('--text'); p.add_argument('--source'); p.add_argument('--id')
@@ -571,6 +604,7 @@ def main(argv=None):
         elif cmd == 'init': result = initialize(root, args.apply_plan)
         elif cmd == 'uninstall': result = uninstall(root)
         elif cmd == 'route': result = route(config(root), read_json(args.task))
+        elif cmd == 'assess': result = assess(config(root), read_json(args.task))
         elif cmd == 'reserve': result = reserve(root, args.usd)
         elif cmd == 'reconcile': result = reconcile(root, args.id, args.actual_usd, args.not_started)
         elif cmd == 'budget-status': result = ledger(root)

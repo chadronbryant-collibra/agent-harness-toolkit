@@ -51,6 +51,9 @@ tools, ask it to guide you into a supported local Claude surface first. Paste:
 
 ## First useful task
 
+Copy the included examples/notes.md to examples/notes.md in the selected workspace,
+preserving any existing file. The notes are invented and require no connector.
+
 Ask Claude: “Organize these three synthetic project notes into an action plan.
 Keep the source notes unchanged. Verify every action points to its source.”
 Then try interruption/resume, a bounded delegated review, and one selected lesson.
