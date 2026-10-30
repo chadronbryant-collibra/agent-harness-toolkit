@@ -8,7 +8,7 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-FILES = ['.gitignore', 'AGENTS.md', 'README.md', 'START-HERE.md', 'CHANGELOG.md', 'manifest.json',
+FILES = ['.gitignore', '.github/workflows/test.yml', 'AGENTS.md', 'README.md', 'START-HERE.md', 'CHANGELOG.md', 'manifest.json',
          'toolkit.py', 'bootstrap.ps1', 'bootstrap.sh']
 TREES = ['config', 'templates', 'docs', 'skills', 'knowledge', 'examples', 'references', 'tests', 'scripts']
 
@@ -18,7 +18,7 @@ def source_files():
     for tree in TREES:
         paths.extend(p for p in (ROOT / tree).rglob('*') if p.is_file() and p.suffix in ('.py', '.md', '.json'))
     for p in paths:
-        if p.is_symlink() or (p.name != '.gitignore' and any(part.startswith('.') for part in p.relative_to(ROOT).parts)):
+        if p.is_symlink() or (p.relative_to(ROOT).as_posix() not in ('.gitignore', '.github/workflows/test.yml') and any(part.startswith('.') for part in p.relative_to(ROOT).parts)):
             raise ValueError('unsafe-source')
     return sorted(paths)
 
@@ -32,7 +32,7 @@ def verify(path):
             raise ValueError('archive-too-large')
         for info in z.infolist():
             parts = PurePosixPath(info.filename).parts
-            if not parts or info.filename.startswith('/') or '\\' in info.filename or ':' in info.filename or any(p in ('.', '..') or (p.startswith('.') and info.filename != '.gitignore') for p in parts):
+            if not parts or info.filename.startswith('/') or '\\' in info.filename or ':' in info.filename or any(p in ('.', '..') or (p.startswith('.') and info.filename not in ('.gitignore', '.github/workflows/test.yml')) for p in parts):
                 raise ValueError('unsafe-member')
             if (info.external_attr >> 16) & 0o170000 == 0o120000:
                 raise ValueError('linked-member')
