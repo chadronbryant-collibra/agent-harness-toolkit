@@ -1,0 +1,5 @@
+[
+  {"id":"claude-setup","url":"https://code.claude.com/docs/en/setup","rights":"link-and-distilled-guidance-only","reviewed_at":"2026-10-30","review_days":30},
+  {"id":"claude-models","url":"https://code.claude.com/docs/en/model-config","rights":"link-and-distilled-guidance-only","reviewed_at":"2026-10-30","review_days":30},
+  {"id":"claude-hooks","url":"https://code.claude.com/docs/en/hooks","rights":"link-and-distilled-guidance-only","reviewed_at":"2026-10-30","review_days":30}
+]
