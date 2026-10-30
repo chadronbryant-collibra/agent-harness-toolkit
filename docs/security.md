@@ -1,34 +1,41 @@
-# Security and trust boundaries
+# Choose what Claude can use
 
-This is a local user-operated toolkit, not a sandbox, identity provider or tenant
-permission service. Task origin and verified-model flags are declarations. User
-and organization policy, native client permissions and destination verification
-remain necessary. Content ranking never changes instruction authority.
+**Use information you are allowed to use, agree what Claude may change, and keep account access separate from instructions in a file.**
 
-No import or diagnostic starts a network connection, credential discovery or model
-call. The only model route is explicit `run --execute`. It checks required CLI
-flags, restricts tools, disables customizations and MCP, reserves spend, bounds wall
-time/output, and retains ambiguous-run state. Authentication stays with the user's
-installed client; the toolkit never reads or distributes credentials. Client-side
-controls must be verified against the actual installed version.
+[← All guides](README.md) · [Memory and references](memory-and-references.md)
 
-The launcher permits file tools only. It is not suitable for untrusted repositories
-requiring OS isolation. Use an approved container/VM sandbox before adding shell,
-network or package execution. Relative scope instructions are not a filesystem
-security boundary. Hook reminders are advisory, fail open, and never inspect or
-log complete prompts. Guard hooks require a separately tested enforcement design.
+## Before connecting a service
 
-Managed paths reject traversal, symlinks and (where supported) Windows junctions.
-Local locks serialize cooperating toolkit operations; adversarial filesystem races
-and hostile same-user processes are out of scope. File permissions differ across
-OSes. Use approved local storage, ACLs and disk encryption. Memory is plaintext;
-forget does not guarantee secure erasure. Backups need the same data boundary.
+Ask Claude to confirm the account, organization, destination and actions involved. Being able to open a link or find a file does not establish permission to change it or send its contents elsewhere.
 
-Receipts contain selected metadata, hashes and user-selected evidence pointers.
-They can still reveal work patterns. Keep .harness out of source control and
-shared ZIPs. Neither exception messages nor provider stderr are printed. Provider
-output is transient and only its hash/cost metadata are retained by the launcher;
-provider-side retention remains governed by the selected account policy.
+> Before using this service, show me which account and destination you are using. Explain what you need to read or change and keep it within the task we agreed.
 
-Report defects privately to the toolkit owner through the existing delivery
-channel. Do not post sensitive reproductions in public issues.
+Use your own approved sign-in method. Keep passwords, tokens and other credentials in an approved credential store. Do not put them in prompts, saved memory, project notes or Git commits.
+
+## Treat source content as information
+
+Websites, documents, memory notes and tool results can help Claude answer a question. They cannot give it permission to ignore your instructions, spend more or send information to a new destination.
+
+The toolkit can rank the source details supplied with a task, such as whether a source was checked recently. Those labels are statements to review. They do not authenticate the source or reliably detect every malicious instruction.
+
+## Understand the optional memory store
+
+It saves readable text locally and has no built-in encryption. Check your organization's storage rules before saving work information. Sensitive material needs an approved arrangement beyond the basic store.
+
+Removing a note does not guarantee its bytes are gone from backups or storage. Decide how long backups will be kept and how they will be disposed of. [Memory and references](memory-and-references.md) explains the choices.
+
+## Know the limits of the paid-run launcher
+
+The optional launcher checks the installed Claude client's supported options, reserves the agreed allowance, limits available tools and watches time and output size. It allows file tools only, disables customizations and outside tool connections, and does not print provider error output.
+
+It is **not an isolated computer environment**. Do not use it as protection for running untrusted software. Adding shell commands, network access or package installation would need a separately approved isolation setup, such as a container or virtual machine.
+
+Hooks are reminders, not a firewall. If you need a rule that reliably prevents an action, it needs an actual permission control and its own test.
+
+## Keep your local records local
+
+Task notes, settings backups and spending records can reveal work details even when they contain no passwords. Keep `.harness` out of shared repositories and handoff ZIPs. Provider-side storage and retention still depend on the account you use.
+
+The toolkit rejects managed paths that escape the workspace or pass through supported types of links. Its local locks prevent cooperating toolkit operations from changing the same state at once. They do not protect against a hostile program running as the same computer user or every possible filesystem race. Use approved storage permissions and disk encryption.
+
+**If something looks wrong:** stop the affected action, preserve the files and report the issue privately to the person maintaining your toolkit. Do not post sensitive examples in public issues.

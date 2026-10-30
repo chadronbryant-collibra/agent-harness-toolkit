@@ -1,28 +1,21 @@
-# Start here each session
+# Start each session with the person's goal
 
-Read AGENTS.md. The toolkit's START-HERE.md and docs/ guide setup and maintenance.
-Your local `.harness/config.json` contains selected preferences, roles and budgets.
-Its model verification flags are owner-reviewed declarations, not authentication.
+Read AGENTS.md. Use the toolkit's START-HERE.md for setup and docs/README.md to find the relevant guide. Those guides live in the downloaded toolkit folder, which may be separate from this workspace. If its location is unknown, ask for it; do not invent paths or assume the guides were copied here. The selected workspace settings are in `.harness/config.json`; they record choices, not proof of account identity or access.
 
-For ordinary work, stay inline. When delegation is authorized, choose a bounded
-role and explicit model/effort after verifying the current surface supports them.
-Every assignment includes outcome, sources, exact write scope, acceptance checks,
-stopping condition and integration owner. One writer owns each worktree. Verify
-returned evidence yourself. A planned role file is not a running agent.
+## Choose enough help to finish
 
-Use Fast for bounded lookup, Standard for normal multi-step work, Deep for hard
-cross-cutting problems. Ask one bounded advisor question only when supported,
-authorized and likely to prevent rework. Do not silently move to paid escalation.
-Prefer verified capability and completion cost over a model brand stereotype.
+Stay with the current session for ordinary work. Fast is for simple lookup, Standard for normal multi-step work, and Deep for difficult connected problems. Check the actual supported model and effort before selecting them. A stronger model does not give you more permission.
 
-Keep the original objective active through follow-ups and context compaction.
-Task checkpoints record objective, authority, owned state, completed work, next
-checks and exact unresolved effects. Never replay an uncertain write.
+When another agent is authorized, give it a result to deliver, sources, exact owned files, checks, a stopping condition and a named integration owner. One writer owns each worktree. Verify the returned work yourself. An agent definition file does not prove the agent loaded or ran.
 
-Memory is disabled until storage and retention are chosen. The included portable
-SQLite memory is plaintext, is not enterprise custody, and is inappropriate for
-secrets or sensitive work unless the organization approves its storage boundary.
-Use source pointers, relevance limits and fresh primary evidence when necessary.
+Use one focused advisor question only when supported, authorized and likely to prevent rework. Do not quietly add paid agents or switch to a more expensive model outside the agreed budget.
 
-Do not create schedules, background watchers, model calls, integrations or memory
-capture merely because a reference describes them. Explain actual limits plainly.
+## Keep continuity clear
+
+Before a pause or conversation shortening, preserve the goal, permission, owned files, completed work, remaining checks and any uncertain action in a short task note. Read the current files before resuming. Never repeat an uncertain write without inspection.
+
+## Keep memory a choice
+
+Memory starts off until contents, storage and retention are agreed. The included store is readable local text without its own encryption. Sensitive work needs an approved storage arrangement. Retrieve only relevant notes and check fresh primary sources when needed.
+
+Do not create schedules, background watchers, model calls, service connections or memory capture merely because a guide describes them. Explain what is actually available in plain language.

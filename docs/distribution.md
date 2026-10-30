@@ -1,17 +1,31 @@
-# Private colleague edition
+# Give someone a useful starting point
 
-The owner requested a new generic toolkit and a package they can give a colleague.
-This repository and ZIP are intended for that private handoff. No public release,
-public repository, open-source license or collaborator invitation is implied.
-Confirm organizational ownership and any additional distribution terms before
-broader publication. No third-party runtime/code or private source history is
-bundled; official documentation is referenced by links and distilled methods.
+**Share the toolkit and its setup guide. Let the recipient choose their own accounts, sources, preferences and budget.**
 
-Build only from reviewed committed source. The archive has an explicit allowlist
-and excludes .git, .harness, credentials, caches and generated files. Its internal
-checksums detect accidental modifications, not publisher authenticity; deliver
-the archive SHA-256 through a trusted independent channel. A malicious replacement
-can replace both archive contents and checksums.
+[← All guides](README.md) · [First-time setup](../START-HERE.md)
 
-The recipient supplies their own accounts, organization rules, sources and budget.
-The package includes generic lessons rather than the maintainer's memory records.
+## What to send
+
+Send the current toolkit ZIP, or a link to the current source download, with this message:
+
+> Unpack this folder and open START-HERE.md with Claude. It will help you choose what you need, check your computer, and walk you through a first task. You do not need to understand every file before starting.
+
+The GitHub repository is publicly viewable. Its older preview release remains a dated snapshot; the main-branch download includes the refreshed guides. Public visibility does not establish an open-source license or permission to redistribute third-party material. Confirm the applicable ownership and distribution terms before broader reuse.
+
+## What stays yours
+
+Do not send your workspace settings, saved memory, task notes, credentials, connection files or private source documents. The reusable kit contains generic instructions and fictional examples, not your working information.
+
+The recipient signs in with their own approved accounts. A shared ZIP or repository link does not connect services, invite collaborators or grant access to your sources.
+
+## Choose a version you can identify
+
+For a handoff you may need to support later, use a named source revision or a versioned package and keep its checksum. A checksum is a short fingerprint of a file: it helps show whether the bytes changed.
+
+The main-branch source download changes when new work is merged. The separately built package includes a list of file checksums. Send its overall checksum through a trusted route if the recipient needs to verify who supplied it; a checksum inside an archive alone cannot prove authenticity.
+
+## For the person building the handoff
+
+Build from reviewed, committed source. The package builder includes only the selected toolkit files and omits Git history, local workspace data, credentials and caches. Verify the archive and try the setup from a clean extraction before sharing it.
+
+[Package commands](reference/commands.md#check-and-package-the-toolkit) · [Setup checks](acceptance.md)
