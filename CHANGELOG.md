@@ -1,5 +1,9 @@
 # What changed
 
+## 1.2.2
+
+Remove the external model integration, associated setup guidance, and model downloads from CI. Keep local keyword memory and support an in-place update of the earlier 1.2 helpers.
+
 ## 1.2.1
 
 Clarify which folder to open in Claude, use the memory skill for everyday questions, and guide local meaning search without requiring an API response or a model fingerprint from the user. The memory preset previews updates to untouched 1.2.0 helper files.

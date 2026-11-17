@@ -14,7 +14,6 @@ from urllib.parse import urlsplit
 import uuid
 
 import toolkit
-from memory_semantic import DEFAULT_MODEL, EmbeddingError, Ollama, bounded_vector, cosine
 
 
 KINDS = ('preference', 'decision', 'progress', 'reference')
@@ -37,8 +36,6 @@ CREATE VIEW IF NOT EXISTS current_records AS
       AND NOT EXISTS (SELECT 1 FROM revisions newer
                       WHERE newer.id=r.id AND newer.version>r.version);
 CREATE TABLE IF NOT EXISTS legacy_imports (legacy_id TEXT PRIMARY KEY, digest TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS semantic_settings (id INTEGER PRIMARY KEY CHECK (id=1), settings TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS vectors (id TEXT PRIMARY KEY, version INTEGER NOT NULL, vector TEXT NOT NULL);
 CREATE VIRTUAL TABLE IF NOT EXISTS keywords USING fts5(id UNINDEXED, title, note, aliases);
 """
 
@@ -164,7 +161,6 @@ def database(root, *, write=False):
 
 def index_record(db, key, record):
     db.execute('DELETE FROM keywords WHERE id=?', (key,))
-    db.execute('DELETE FROM vectors WHERE id=?', (key,))
     if record:
         db.execute('INSERT INTO keywords VALUES (?, ?, ?, ?)',
                    (key, record['title'], record['note'], ' '.join(record['aliases'])))
@@ -223,51 +219,12 @@ def keyword_rows(db, query, limit):
     """, (match, limit)).fetchall()
 
 
-def get_semantic_settings(db):
-    row = db.execute('SELECT settings FROM semantic_settings WHERE id=1').fetchone() if db else None
-    return json.loads(row[0]) if row else None
-
-
-def semantic_rows(db, cfg, question, limit):
-    if cfg is None:
-        return [], 'disabled'
-    rows = db.execute("""
-        SELECT c.*, v.vector FROM current_records c JOIN vectors v ON v.id=c.id AND v.version=c.version
-    """).fetchall()
-    if not rows:
-        return [], 'index-empty'
-    runtime = Ollama.from_settings(cfg)
-    vector = runtime.embed([question])[0]
-    ranked = [(cosine(vector, bounded_vector(json.loads(row['vector']))), row) for row in rows]
-    ranked.sort(key=lambda item: (-item[0], item[1]['id']))
-    count = db.execute('SELECT count(*) FROM current_records').fetchone()[0]
-    status = 'ready' if count == len(rows) else 'partial-index'
-    return [row for score, row in ranked[:limit] if score >= 0.30], status
-
-
-def recall(root, query, limit, semantic=None):
+def recall(root, query, limit):
     query = text(query, 500)
     with database(root) as db:
-        if db is None:
-            return {'mode': 'keyword', 'results': [], 'semantic_status': 'disabled'}
-        matches = keyword_rows(db, query, limit)
-        related, state = [], 'not-selected'
-        settings = get_semantic_settings(db) if semantic is not False else None
-        if semantic is True or (settings and settings.get('use_by_default', False)):
-            try:
-                related, state = semantic_rows(db, settings, query, limit)
-            except EmbeddingError:
-                state = 'unavailable'
-        ranked = {}
-        for method, rows in (('keyword', matches), ('semantic', related)):
-            for rank, row in enumerate(rows, 1):
-                entry = ranked.setdefault(row['id'], {'score': 0.0, 'row': row, 'matched_by': []})
-                entry['score'] += 1 / (8 + rank)
-                entry['matched_by'].append(method)
-        results = sorted(ranked.values(), key=lambda entry: (-entry['score'], entry['row']['id']))[:limit]
-        return {'mode': 'hybrid' if state in ('ready', 'partial-index') else 'keyword',
-                'semantic_status': state,
-                'results': [dict(pointer(root, entry['row']), matched_by=entry['matched_by']) for entry in results]}
+        matches = keyword_rows(db, query, limit) if db else []
+        return {'mode': 'keyword',
+                'results': [dict(pointer(root, row), matched_by=['keyword']) for row in matches]}
 
 
 def read_records(root, command, key=None, kind=None, limit=5):
@@ -364,125 +321,34 @@ def migrate(root, expected):
     return {'imported': imported, 'skipped': skipped, 'legacy_preserved': True}
 
 
-def semantic_check(root, port=None, model=None):
-    if not setup_state(root):
-        return {'status': 'memory-not-set-up-here',
-                'next_step': 'Open the folder where you installed memory. See START-HERE.md to set it up.'}
-    with database(root) as db:
-        configured = get_semantic_settings(db)
-        count = db.execute('SELECT count(*) FROM vectors').fetchone()[0] if db else 0
-    selected = Ollama(port if port is not None else (configured or {}).get('port', 11434),
-                      model if model is not None else (configured or {}).get('model', DEFAULT_MODEL))
-    pinned = configured and selected.port == configured['port'] and selected.model == configured['model']
-    if pinned:
-        selected = Ollama.from_settings(configured)
-    try:
-        selected.verify()
-    except EmbeddingError as error:
-        reason = str(error)
-        next_step = {
-            'local-model-changed': 'The installed model changed. Review it, configure it again, and rebuild search for your selected notes.',
-            'local-model-not-installed': 'Open Ollama in local-only mode and download the displayed local model.',
-        }.get(reason, 'Start Ollama in local-only mode on this machine and check again.')
-        return {'status': reason, 'model': selected.model, 'next_step': next_step}
-    if not pinned:
-        next_step = 'Choose whether to enable this local model for this folder. No notes have been indexed.'
-        state = 'model-ready-to-configure'
-    elif count == 0:
-        next_step = 'Choose one or more saved notes for search by meaning.'
-        state = 'choose-notes'
-    else:
-        next_step = 'Ask your question in this folder. Keyword search remains available.'
-        state = 'ready'
-    return {'status': state, 'model': selected.model, 'indexed': count if pinned else 0,
-            'use_by_default': bool(pinned and configured.get('use_by_default', False)),
-            'next_step': next_step}
-
-
-def semantic_configure(root, port, model, digest, default=None):
-    if not setup_state(root):
-        raise MemoryError('memory-not-set-up-here: open your work folder first')
-    discovered = Ollama(port, model, digest).verify()
-    runtime = Ollama(port, model, discovered)
-    with database(root, write=True) as db:
-        previous = get_semantic_settings(db)
-        same_model = previous and Ollama.from_settings(previous).settings == runtime.settings
-        if not same_model:
-            db.execute('DELETE FROM vectors')
-        if default is None:
-            default = bool(previous and previous.get('use_by_default', False))
-        settings = dict(runtime.settings, use_by_default=default)
-        db.execute('INSERT OR REPLACE INTO semantic_settings VALUES(1, ?)', (packed(settings),))
-    return {'semantic': 'configured', 'indexed': 'kept' if same_model else 'not-yet-built',
-            'model': model, 'digest': discovered, 'use_by_default': default}
-
-
-def semantic_build(root, selected, all_records=False):
-    with database(root) as db:
-        settings = get_semantic_settings(db)
-        if settings is None:
-            raise MemoryError('configure-local-semantic-search-first')
-        if bool(selected) == all_records or len(selected) > MAX_INDEX_ROWS or len(set(selected)) != len(selected):
-            raise MemoryError('choose-record-ids-or-all')
-        if selected:
-            marks = ','.join('?' for _ in selected)
-            query = f'SELECT * FROM current_records WHERE id IN ({marks}) ORDER BY id'
-            rows = db.execute(query, selected).fetchall()
-            if len(rows) != len(selected):
-                raise MemoryError('selected-record-missing')
-        else:
-            rows = db.execute('SELECT * FROM current_records ORDER BY id LIMIT ?', (MAX_INDEX_ROWS + 1,)).fetchall()
-    if len(rows) > MAX_INDEX_ROWS:
-        raise MemoryError('semantic-workspace-limit-use-keyword-search')
-    runtime = Ollama.from_settings(settings)
-    runtime.verify()
-    built = []
-    for start in range(0, len(rows), 16):
-        group = rows[start:start + 16]
-        notes = [json.loads(row['record']) for row in group]
-        vectors = runtime.embed([r['title'] + '\n' + r['note'] for r in notes])
-        built.extend((row['id'], row['version'], packed(v)) for row, v in zip(group, vectors, strict=True))
-    with database(root, write=True) as db:
-        live = [tuple(row) for row in db.execute('SELECT id, version FROM current_records ORDER BY id')
-                if all_records or row['id'] in selected]
-        if live != [(row['id'], row['version']) for row in rows] or get_semantic_settings(db) != settings:
-            raise MemoryError('records-changed-during-index-build')
-        db.execute('DELETE FROM vectors')
-        db.executemany('INSERT INTO vectors VALUES (?, ?, ?)', built)
-    return {'semantic': 'indexed', 'records': len(built), 'model': runtime.model}
-
-
 def maintenance(root, command):
     if command == 'status':
         enabled = setup_state(root)
         report = {'enabled': enabled, 'storage': DB, 'format': 'plaintext-local',
                   'legacy_available': toolkit.safe_path(root, LEGACY).is_file(),
-                  'provider_calls': 0, 'records': 0, 'semantic': 'disabled'}
+                  'provider_calls': 0, 'records': 0}
         if enabled:
             with database(root) as db:
                 if db:
                     report['records'] = db.execute('SELECT count(*) FROM current_records').fetchone()[0]
-                    if get_semantic_settings(db):
-                        report['semantic'] = 'configured'
-                        report['semantic_indexed'] = db.execute('SELECT count(*) FROM vectors').fetchone()[0]
         return report
     with database(root, write=True) as db:
-        db.execute('DELETE FROM vectors')
-        if command == 'semantic-off':
-            db.execute('DELETE FROM semantic_settings')
-            return {'semantic': 'disabled', 'vectors_removed': True}
+        # Older public stores can still hold rebuildable index tables.
+        # Discard these on explicit maintenance without touching revisions.
+        db.execute('DROP TABLE IF EXISTS vectors')
+        db.execute('DROP TABLE IF EXISTS semantic_settings')
         db.execute('DELETE FROM keywords')
         rows = db.execute('SELECT * FROM current_records').fetchall()
         for row in rows:
             index_record(db, row['id'], json.loads(row['record']))
-        return {'status': 'rebuilt', 'records': len(rows), 'semantic_index': 'cleared'}
+        return {'status': 'rebuilt', 'records': len(rows)}
 
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', default='.')
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('status', 'save', 'rebuild', 'semantic-off'):
+    for name in ('status', 'save', 'rebuild'):
         sub.add_parser(name)
     for name in ('correct', 'forget'):
         item = sub.add_parser(name)
@@ -496,25 +362,8 @@ def parse_args(argv):
             item.add_argument('--limit', type=int, default=5)
         if name == 'current':
             item.add_argument('--kind', choices=KINDS)
-        if name == 'recall':
-            mode = item.add_mutually_exclusive_group()
-            mode.add_argument('--semantic', action='store_true', default=None)
-            mode.add_argument('--keyword-only', action='store_false', dest='semantic')
     sub.add_parser('export').add_argument('file')
     sub.add_parser('import-legacy').add_argument('--apply-plan')
-    build = sub.add_parser('semantic-build')
-    build.add_argument('--id', action='append', default=[])
-    build.add_argument('--all', action='store_true')
-    check = sub.add_parser('semantic-check')
-    check.add_argument('--port', type=int)
-    check.add_argument('--model')
-    item = sub.add_parser('semantic-configure')
-    item.add_argument('--port', type=int, default=11434)
-    item.add_argument('--model', default=DEFAULT_MODEL)
-    item.add_argument('--digest')
-    choice = item.add_mutually_exclusive_group()
-    choice.add_argument('--use-by-default', action='store_true', default=None)
-    choice.add_argument('--manual', action='store_false', dest='use_by_default')
     return parser.parse_args(argv)
 
 
@@ -530,24 +379,18 @@ def main(argv=None):
             record = validate(root, json.loads(read_input(30000))) if cmd != 'forget' else None
             result = changes(root, cmd, record, getattr(args, 'id', None), getattr(args, 'version', None))
         elif cmd == 'recall':
-            result = recall(root, read_input(2048), limit, args.semantic)
+            result = recall(root, read_input(2048), limit)
         elif cmd in ('current', 'show', 'history'):
             result = read_records(root, cmd, getattr(args, 'id', None), getattr(args, 'kind', None), limit)
         elif cmd == 'export':
             result = export(root, args.file)
         elif cmd == 'import-legacy':
             result = migrate(root, args.apply_plan)
-        elif cmd == 'semantic-check':
-            result = semantic_check(root, args.port, args.model)
-        elif cmd == 'semantic-configure':
-            result = semantic_configure(root, args.port, args.model, args.digest, args.use_by_default)
-        elif cmd == 'semantic-build':
-            result = semantic_build(root, args.id, args.all)
         else:
             result = maintenance(root, cmd)
         print(toolkit.encode(result).decode(), end='')
         return 0
-    except (toolkit.HarnessError, EmbeddingError) as error:
+    except toolkit.HarnessError as error:
         print(toolkit.encode({'status': 'refused', 'reason': str(error)}).decode(), end='', file=sys.stderr)
     except (OSError, ValueError, sqlite3.Error, TypeError):
         print('Memory operation failed. Check the workspace, input and SQLite FTS5 support.', file=sys.stderr)

@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[1]
 FILES = (
     'docs/reference/memory.md',
     'memory_harness.py',
-    'memory_semantic.py',
     'skills/workspace-memory/SKILL.md',
     'templates/memory/settings.json',
     'templates/memory/ignore',
@@ -19,7 +18,6 @@ FILES = (
     'examples/memory/project.md',
     'examples/memory/decision.json',
     'tests/test_memory_harness.py',
-    'tests/semantic_canary.py',
     'docs/index.html',
     'docs/learn/advanced.md',
     'docs/learn/connections.md',
