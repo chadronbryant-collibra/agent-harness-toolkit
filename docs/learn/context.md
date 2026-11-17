@@ -8,7 +8,7 @@ Open the extracted toolkit in Claude Code and try this prompt.
 2. Say “Remember that I like project briefs to start with blockers.” Claude shows the saved preference and where it lives.
 3. Open a fresh Claude Code session in the same folder. Say “Use workspace-memory. How do I like my project briefs?”
 
-For a decision, save a note with its source. On recall, Claude opens the source through your approved access and can flag a change or a missing source. Ask before saving or correcting information. The toolkit's memory is plaintext on your machine. Use it for material suitable for that storage and keep the directory out of shared repositories and inappropriate backups.
+For a decision, save a note with its source. On recall, Claude opens the source through your approved access and can flag a change or a missing source. Save or correct only what you ask Claude to keep. The toolkit's memory is plaintext on your machine. Use it for material suitable for that storage and keep the directory out of shared repositories and inappropriate backups.
 
 ## Keep project context and references
 

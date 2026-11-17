@@ -13,7 +13,7 @@ python3 kit.py --workspace "/path/to/work" add memory-harness --apply-plan PLAN_
 
 The preset installs the workspace-memory skill, its local scripts and settings, and an ignore rule under `.harness/`. It doesn't create a database until a memory operation needs one. It preserves existing files. If your target already has a different file at a planned path, review that conflict before making the smallest needed change. Use the separate `context` and `references` presets if you want starter files for either. Review the exact paths before sharing or backing up the workspace.
 
-From the workspace, the command prefix is `python3 .harness/memory-tools/memory_harness.py`. On Windows use the installed Python 3.11+ command, such as `py -3`. Status checks what is present. A fresh Claude Code session verifies skill discovery. Try the documented prompts after reopening that folder.
+From the workspace, the command prefix is `python3 .harness/memory-tools/memory_harness.py`. On Windows use the installed Python 3.11+ command, such as `py -3`. Status checks what is present. A fresh Claude Code session verifies skill discovery. Claude needs permission to run the local Python helper when using the skill. Try the documented prompts after reopening that folder.
 
 Pass record JSON to `save` on standard input. Use one source type and reference. A file source must be a bounded, workspace-relative file. A link must use HTTPS without credentials or query parameters. For a preference the user states, use a user source label. Choose `preference`, `decision`, `progress`, or `reference`. An optional `aliases` list can provide alternate terms.
 
