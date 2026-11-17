@@ -1,23 +1,25 @@
-# Pick up where you left off
+# Keep something useful and find it again
 
-Copy the two Markdown files from [templates/context](../../templates/context) into a `context/` folder in your workspace. Keep existing files with the same names. Use `PROJECT.md` to record the outcome, current work, and next step. Use `PREFERENCES.md` for a few things you want the assistant to remember across sessions.
+Open the extracted toolkit in Claude Code and try this prompt.
 
-> Read context/PROJECT.md and open the sources it links to. Tell me what to do next.
+> Help me set up memory for this folder. Show me what you'll add. Then help me save one preference and find it in a fresh session.
 
-Open a fresh session and try that prompt. If a source changed, use the new source and say what no longer matches the saved note. For regular use, ask Claude to add a short pointer to this folder in your existing project instructions. Only save a preference or decision you choose to keep.
+1. Choose the folder where you want the memory. Claude shows the files it will copy and keeps your existing instructions. The helper needs Python 3.11 or later.
+2. Say “Remember that I like project briefs to start with blockers.” Claude shows the saved preference and where it lives.
+3. Open a fresh Claude Code session in the same folder. Say “Use workspace-memory. How do I like my project briefs?”
 
-## Start a reference library
+For a decision, save a note with its source. On recall, Claude opens the source through your approved access and can flag a change or a missing source. Save or correct only what you ask Claude to keep. The toolkit's memory is plaintext on your machine. Use it for material suitable for that storage and keep the directory out of shared repositories and inappropriate backups.
 
-Copy [templates/reference-library](../../templates/reference-library) to `reference-library/` in your workspace. Start with two or three sources. Add a link, what it answers, and when it was last checked. Keep your source files where they belong. You can use the same structure in a repository of its own once you need to share or version it.
+## Keep project context and references
 
-> Read reference-library/SOURCES.md. Find the source that answers my question, open it if I have access, and show me where the answer came from.
+Use the [context starter](../../templates/context) to keep a short project update, next action, and links. Keep a few sources in [the reference index](../../templates/reference-library/SOURCES.md). You can place those files in your workspace or version the reference library in its own repository. Give each source a useful name, what it answers, and a review date.
 
-Try [find-a-source](skills.md) if you want the same source check each time. Review dates are reminders to inspect a source. Sharing the index does not grant access to linked files.
+> Read the project context and open the source it points to. What should I do next?
 
-## Add searchable memory
+Open a fresh session to try it. Plain context files work even when searchable memory is off. The included brief and source-finding skills can use the same files. An existing Google Workspace or GitHub connection can open a source when the current account has access. [Check a connection](connections.md)
 
-For a few notes, start with the files above. To search more saved items, the toolkit includes an optional local memory store. It saves short entries with source labels and searches for matching text. Use a harmless preference first, then check it in a fresh session and remove it if you want.
+## Add search by meaning when it helps
 
-Ask Claude to open the [memory setup instructions](advanced.md#try-searchable-memory) and help you complete that first example. The store starts off and uses plaintext SQLite inside the chosen workspace. Choose what you can keep there, avoid secrets and sensitive notes, and keep the state out of shared repositories. This edition ships local memory commands. It does not connect to a private Memory Harness service or provide meaning-based search.
+Use keyword search for names, phrases, and saved aliases. If you often describe a topic in different words, ask Claude to help you enable [search by meaning](../reference/memory.md#search-by-meaning). You choose the local model and which saved items to index. Keyword recall stays available while the option is off or unavailable.
 
-[Memory and references](../memory-and-references.md)
+[Exact memory commands, import and recovery](../reference/memory.md)

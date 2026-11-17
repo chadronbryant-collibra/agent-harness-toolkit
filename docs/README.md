@@ -11,7 +11,7 @@
 | Set up a skill or connect to work I already use | [Choose what to set up](../START-HERE.md) |
 | Give Claude a useful task and follow it through | [Everyday use](everyday-use.md) |
 | Choose a model and keep spending in view | [Models and cost](models-and-cost.md) |
-| Save useful preferences, decisions and references | [Memory and references](memory-and-references.md) |
+| Save useful preferences, decisions and references | [Memory and references](learn/context.md) |
 | Add a skill, plugin, tool or GitHub repository | [Extend your setup](extensions.md) |
 | Keep things working, recover from a problem or uninstall | [Maintenance](maintenance.md) |
 

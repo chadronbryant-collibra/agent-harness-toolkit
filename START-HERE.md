@@ -1,18 +1,15 @@
-# What would you like help with?
+# Set up your assistant for one task
 
-Open the extracted toolkit in a Claude Code session that can access your files. You can also read these guides in a browser. Pick the outcome you want to try today.
+Extract the toolkit and open that folder in Claude Code. Choose a folder where you work. Claude can help you add to an existing setup or start a new folder.
 
-> Help me set up one thing from START-HERE.md. Use the files already included. Show me where they’ll go and help me check the result.
+> Help me set up one thing from START-HERE.md. Use the files already included, show me where they’ll go, and help me try it.
 
 | I want to… | Start here |
 | --- | --- |
-| Do a recurring task the same way | [Add a skill](docs/learn/skills.md) |
-| Pick up where I left off | [Add context and memory](docs/learn/context.md) |
-| Find answers in sources I trust | [Start a reference library](docs/learn/context.md#start-a-reference-library) |
-| Get advice or a second opinion | [Review a plan](docs/learn/skills.md#get-a-second-opinion) |
+| Save something useful and find it again | [Set up memory and context](docs/learn/context.md) |
+| Pick up a project or find a trusted source | [Keep project context and references](docs/learn/context.md#keep-project-context-and-references) |
+| Repeat work or get a second opinion | [Add a ready-made skill](docs/learn/skills.md) |
 | Open a GitHub repository or a Google Workspace file | [Check a connection](docs/learn/connections.md) |
-| Build something of my own | [Build a skill from a template](docs/learn/skills.md#make-it-yours) |
+| Build a skill of my own | [Adapt a template](docs/learn/skills.md#make-it-yours) |
 
-Use a new folder or a folder you already work in. Start with one option and add another whenever it helps. The starter files can be copied without Python. Ordinary Claude usage follows your account plan. Adding a connection can have its own usage rules.
-
-[Guide for Claude](docs/reference/setup-for-claude.md) · [Advanced tools](docs/learn/advanced.md) · [Try with fictional files](examples/workshop/README.md)
+Memory and the optional command-line tools use Python 3.11 or later. You can use the plain context and skill files without installing Python. [Guide for Claude](docs/reference/setup-for-claude.md) · [Advanced tools](docs/learn/advanced.md) · [Optional practice](examples/workshop/README.md)

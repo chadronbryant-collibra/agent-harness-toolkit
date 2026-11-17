@@ -23,24 +23,24 @@
     <section class="hero">
       <div class="shell hero-grid">
         <div>
-          <h1>Set up your assistant for the work you do</h1>
-          <p class="intro">Start with one task. Add a ready-made skill, give Claude sources you trust, or check a connection you already use.</p>
+          <h1>Give Claude context it can use again</h1>
+          <p class="intro">Save one preference, pick up a project, or find the decision behind the next step. Use the skills and scripts already in the toolkit.</p>
           <div class="actions">
-            <a class="button primary" href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.1.0/agent-harness-toolkit-1.1.0.zip">Download the toolkit</a>
+            <a class="button primary" href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.2.0/agent-harness-toolkit-1.2.0.zip">Download the toolkit</a>
             <a class="button" href="#walkthrough">See how it works</a>
           </div>
           <p class="caption">Open the extracted folder in Claude Code and start with <code>START-HERE.md</code>.</p>
         </div>
         <figure class="example">
           <figcaption>Example in Claude Code</figcaption>
-          <p class="prompt">“Use /write-a-brief on these notes. Put blockers first.”</p>
+          <p class="prompt">“How do I like my project briefs?”</p>
           <div class="response">
-            <strong>Project brief</strong>
+            <strong>Saved preference</strong>
             <dl>
-              <div><dt>Blocker</dt><dd>Confirm who will review the draft.</dd></div>
-              <div><dt>Next step</dt><dd>Send the draft to the reviewer once assigned.</dd></div>
+              <div><dt>Format</dt><dd>Put blockers first in project briefs.</dd></div>
+              <div><dt>Next use</dt><dd>Apply it when drafting the next brief.</dd></div>
             </dl>
-            <p class="caption">Source: planning notes, review section</p>
+            <p class="caption">Source: preference saved by the user</p>
           </div>
         </figure>
       </div>
@@ -49,8 +49,8 @@
       <h2>See three ways to start</h2>
       <div class="walkthrough">
         <div class="selection" aria-label="Walkthrough example" hidden>
-          <button type="button" data-example="skill" aria-pressed="true">Add a skill</button>
-          <button type="button" data-example="context" aria-pressed="false">Pick up later</button>
+          <button type="button" data-example="context" aria-pressed="true">Remember something</button>
+          <button type="button" data-example="skill" aria-pressed="false">Add a skill</button>
           <button type="button" data-example="connection" aria-pressed="false">Check a connection</button>
         </div>
         <article data-story="skill">
@@ -63,11 +63,11 @@
           <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/skills.md">Set up a skill <span aria-hidden="true">→</span></a>
         </article>
         <article data-story="context">
-          <h3>Come back to the decision and its source</h3>
+          <h3>Save a preference and find it again</h3>
           <ol>
-            <li><strong>Keep.</strong> Save the next action and the link behind it in your project context.</li>
-            <li><strong>Return.</strong> In a new session, ask Claude what you should do next.</li>
-            <li><strong>Check.</strong> Claude reads the current source and points out any change since the saved note.</li>
+            <li><strong>Save.</strong> “Remember that I like project briefs to start with blockers.”</li>
+            <li><strong>Return.</strong> Reopen the folder and ask “How do I like my project briefs?”</li>
+            <li><strong>Check.</strong> Claude finds the saved preference and says where it came from.</li>
           </ol>
           <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/context.md">Set up context and memory <span aria-hidden="true">→</span></a>
         </article>
@@ -95,8 +95,9 @@
     </section>
     <aside class="shell section extra">
       <h2>Use the command line when you need it</h2>
+      <p>Optional search by meaning can match different wording with a model you choose to run locally. <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/reference/memory.md#search-by-meaning">Set up search by meaning</a>.</p>
       <p>The download includes local commands for copying presets, trying searchable memory, and checking the project in an Apps Script or Google Cloud configuration.</p>
-      <p>Local scripts make no Claude calls. Work you ask Claude to do uses the billing for your current session.</p>
+      <p>Local memory and setup scripts make no Claude calls. Work you ask Claude to do uses the billing for your current session.</p>
       <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/advanced.md">Explore advanced tools <span aria-hidden="true">→</span></a>
     </aside>
   </main>

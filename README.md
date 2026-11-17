@@ -1,9 +1,9 @@
 # Agent Harness Toolkit
 
-Set up an assistant that can use your references, remember what you choose to save, and repeat the work you do often.
+Give Claude context it can use again. Save a preference, pick up a project, or find the source behind a decision. Add ready-made skills and connections as you need them.
 
-[Choose what to set up](https://chadronbryant-collibra.github.io/agent-harness-toolkit/) · [Download the toolkit](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.1.0/agent-harness-toolkit-1.1.0.zip) · [Start with Claude](START-HERE.md)
+[Download the ZIP](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.2.0/agent-harness-toolkit-1.2.0.zip) · [See the walkthrough](https://chadronbryant-collibra.github.io/agent-harness-toolkit/)
 
-Download the ZIP, open it in a local Claude Code session, and ask: **“Help me set up one thing from START-HERE.md.”** Pick a ready-made skill, add context and references, get a second opinion, or check a GitHub or Google Workspace connection.
+Extract the ZIP, open it in Claude Code, and ask **“Help me set up one thing from START-HERE.md.”** Start with [memory and context](docs/learn/context.md), [a skill](docs/learn/skills.md), or [a connection check](docs/learn/connections.md).
 
-Start with your own task. [An optional practice example](examples/workshop/README.md) is included. The [advanced guide](docs/learn/advanced.md) has ready-made commands for local memory, Apps Script, and Google Cloud.
+The toolkit includes the files and scripts. Claude helps you choose, copy, and verify them. Keyword recall runs locally. [Search by meaning](docs/reference/memory.md#search-by-meaning) is optional.

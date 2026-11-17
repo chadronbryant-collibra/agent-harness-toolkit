@@ -14,23 +14,7 @@ The first add shows exactly what would be copied. Use its digest to apply the re
 
 ## Try searchable memory
 
-Pick a local practice folder with appropriate access and backup settings. Add `.harness/` to the workspace's Git ignore rules if applicable. The memory preset adds an enabled configuration without creating a store or saving anything. Apply the preview only after you choose to enable memory in that folder.
-
-```text
-python3 kit.py --workspace "/path/to/practice" add memory
-python3 kit.py --workspace "/path/to/practice" add memory --apply-plan PLAN_SHA256
-```
-
-If you already have a toolkit configuration, keep it. Ask Claude to show the change to the existing `memory.enabled` setting and apply it only when you choose. Then try a fictional preference.
-
-```text
-python3 kit.py --workspace "/path/to/practice" memory-status
-python3 toolkit.py --workspace "/path/to/practice" memory remember --text "Put blockers first in a brief" --source "user:practice"
-python3 toolkit.py --workspace "/path/to/practice" memory search --text "blockers first"
-python3 toolkit.py --workspace "/path/to/practice" memory forget --id RETURNED_ID
-```
-
-In a new session, give Claude the toolkit and workspace locations and ask it to find the saved preference. For a real decision, save a link or path to its source and reopen it before relying on the decision. The examples pass harmless text on the command line. Keep secrets and sensitive material out of the store and command history. Removing an item from results does not erase every backup.
+Use the [Memory Harness reference](../reference/memory.md) for setup, saving, recall, import, and optional meaning search. The original `toolkit.py memory` commands remain available to inspect your 1.1 store before import.
 
 ## Check the selected Apps Script or Google Cloud project
 

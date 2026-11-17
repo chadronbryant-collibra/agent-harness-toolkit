@@ -20,6 +20,14 @@ PRESETS = {
     },
     'references': {'reference-library/SOURCES.md': 'templates/reference-library/SOURCES.md'},
     'memory': {'.harness/config.json': 'config/defaults.json'},
+    'memory-harness': {
+        '.harness/memory-harness.json': 'templates/memory/settings.json',
+        '.harness/.gitignore': 'templates/memory/ignore',
+        '.harness/memory-tools/memory_harness.py': 'memory_harness.py',
+        '.harness/memory-tools/memory_semantic.py': 'memory_semantic.py',
+        '.harness/memory-tools/toolkit.py': 'toolkit.py',
+        '.claude/skills/workspace-memory/SKILL.md': 'skills/workspace-memory/SKILL.md',
+    },
 }
 
 
