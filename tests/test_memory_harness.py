@@ -1,71 +1,19 @@
 import contextlib
-import http.server
 from unittest.mock import patch
 import json
-import os
 from pathlib import Path
 import sqlite3
 import subprocess
 import sys
 import tempfile
-import threading
 import unittest
 import uuid
 
 import kit
 import toolkit
-from memory_semantic import EmbeddingError, Ollama
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL = 'local-model:latest'
-DIGEST = 'a' * 64
-
-
-class FakeOllama(http.server.BaseHTTPRequestHandler):
-    def log_message(self, *_args):
-        pass
-
-    def reply(self, result, code=200):
-        payload = json.dumps(result).encode()
-        self.send_response(code)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Content-Length', str(len(payload)))
-        self.end_headers()
-        self.wfile.write(payload)
-
-    def do_GET(self):
-        if self.path != '/api/tags':
-            return self.reply({}, 404)
-        self.reply({'models': [{'name': MODEL, 'digest': self.server.digest,
-                                'details': {'format': 'gguf'}}]})
-
-    def do_POST(self):
-        if self.path != '/api/embed':
-            return self.reply({}, 404)
-        request = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-        inputs = request['input']
-        self.server.received.extend(inputs)
-        vectors = [[1.0, 0.0] if 'registration' in text.lower() or 'sign up' in text else [0.0, 1.0]
-                   for text in inputs]
-        self.reply({'model': MODEL, 'embeddings': vectors})
-
-
-@contextlib.contextmanager
-def fake_ollama():
-    server = http.server.HTTPServer(('127.0.0.1', 0), FakeOllama)
-    server.digest = DIGEST
-    server.received = []
-    thread = threading.Thread(target=server.serve_forever)
-    thread.start()
-    try:
-        yield server
-    finally:
-        server.shutdown()
-        server.server_close()
-        thread.join(timeout=10)
-
-
 class WorkspaceMemory(unittest.TestCase):
     def setUp(self):
         self.scratch = tempfile.TemporaryDirectory(prefix='memory workspace ')
@@ -149,67 +97,6 @@ class WorkspaceMemory(unittest.TestCase):
         self.assertEqual(result['source']['ref'], 'Local label\nunchanged ')
         self.assertEqual(path.read_bytes(), original)
 
-    def test_semantic_uses_selected_current_records_and_falls_back(self):
-        self.install()
-        (self.root / 'project.md').write_text('Registration plan', encoding='utf-8')
-        key = self.memory('save', data=self.record())['id']
-        other = self.root / 'Other workspace'
-        other.mkdir()
-        self.install(other)
-        self.assertEqual(self.memory('recall', data='registration', root=other)['results'], [])
-        with fake_ollama() as service:
-            self.assertEqual(self.memory('recall', data='When can people sign up?')['results'], [])
-            cfg = ['semantic-configure', '--port', str(service.server_port), '--model', MODEL, '--digest', DIGEST]
-            self.memory(*cfg)
-            self.memory('semantic-build', expect=2)
-            self.assertEqual(service.received, [])
-            self.memory('semantic-build', '--id', key)
-            found = self.memory('recall', '--semantic', data='When can people sign up?')
-            self.assertEqual(found['results'][0]['id'], key)
-            self.assertEqual(found['results'][0]['matched_by'], ['semantic'])
-            service.digest = 'f' * 64
-            previous = list(service.received)
-            fallback = self.memory('recall', '--semantic', data='registration')
-            self.assertEqual(fallback['semantic_status'], 'unavailable')
-            self.assertEqual(fallback['results'][0]['id'], key)
-            self.assertEqual(service.received, previous)
-            service.digest = DIGEST
-            self.memory('forget', key, '--version', '1')
-            self.assertEqual(self.memory('recall', '--semantic', data='sign up')['results'], [])
-            self.assertEqual(self.memory('status')['semantic_indexed'], 0)
-            self.memory('semantic-off')
-            self.assertEqual(self.memory('status')['semantic'], 'disabled')
-
-    def test_guided_meaning_setup_discovers_model_and_remembers_choice(self):
-        self.assertEqual(self.call('memory_harness.py', 'semantic-check')['status'], 'memory-not-set-up-here')
-        self.install()
-        (self.root / 'project.md').write_text('Registration plan', encoding='utf-8')
-        key = self.memory('save', data=self.record())['id']
-        with fake_ollama() as service:
-            port = str(service.server_port)
-            before = self.memory('semantic-check', '--port', port, '--model', MODEL)
-            self.assertEqual(before['status'], 'model-ready-to-configure')
-            self.assertEqual(service.received, [])
-            result = self.memory('semantic-configure', '--port', port, '--model', MODEL, '--use-by-default')
-            self.assertEqual(result['digest'], DIGEST)
-            self.assertEqual(self.memory('semantic-check')['status'], 'choose-notes')
-            self.assertEqual(service.received, [])
-            self.memory('semantic-build', '--id', key)
-            ready = self.memory('semantic-check')
-            self.assertEqual(ready['indexed'], 1)
-            self.assertTrue(ready['use_by_default'])
-            self.assertEqual(self.memory('recall', data='When can people sign up?')['results'][0]['id'], key)
-            previous = list(service.received)
-            self.assertEqual(self.memory('recall', '--keyword-only', data='When can people sign up?')['results'], [])
-            self.assertEqual(service.received, previous)
-            service.digest = 'e' * 64
-            self.assertEqual(self.memory('semantic-check')['status'], 'local-model-changed')
-            service.digest = DIGEST
-            self.memory('semantic-configure', '--port', port, '--model', MODEL, '--manual')
-            self.assertFalse(self.memory('semantic-check')['use_by_default'])
-            self.assertEqual(self.memory('semantic-check')['indexed'], 1)
-            self.assertEqual(self.memory('recall', data='When can people sign up?')['mode'], 'keyword')
-
     def test_upgrade_keeps_saved_records_and_rejects_an_edited_helper(self):
         self.install()
         (self.root / 'project.md').write_text('Registration plan', encoding='utf-8')
@@ -231,11 +118,40 @@ class WorkspaceMemory(unittest.TestCase):
         self.assertEqual(self.memory('show', key)['note'], 'Registration opens after venue confirmation.')
         self.assertTrue((self.root / '.claude/rules/toolkit-memory.md').is_file())
 
-    def test_unsafe_sources_and_cloud_model_are_refused(self):
+    def test_upgrade_removes_only_the_shipped_retired_helper(self):
+        self.install()
+        retired = self.root / kit.RETIRED_MEMORY_FILE
+        original = b'Shipped older helper'
+        retired.write_bytes(original)
+        with patch.dict(kit.MEMORY_121, {kit.RETIRED_MEMORY_FILE: toolkit.digest(original)}):
+            plan = kit.add(self.root, 'memory-harness')
+            self.assertEqual(plan['files'][-1]['status'], 'remove')
+            self.assertEqual(kit.add(self.root, 'memory-harness', plan['plan_sha256'])['files_removed'],
+                             [kit.RETIRED_MEMORY_FILE])
+            self.assertFalse(retired.exists())
+            retired.write_bytes(b'User edit')
+            plan = kit.add(self.root, 'memory-harness')
+            self.assertEqual(plan['files'][-1]['status'], 'keep-edited')
+            kit.add(self.root, 'memory-harness', plan['plan_sha256'])
+            self.assertEqual(retired.read_bytes(), b'User edit')
+
+    def test_rebuild_removes_old_index_tables_without_changing_saved_records(self):
+        self.install()
+        (self.root / 'project.md').write_text('Registration plan', encoding='utf-8')
+        key = self.memory('save', data=self.record())['id']
+        store = self.root / '.harness/memory-harness.sqlite3'
+        with contextlib.closing(sqlite3.connect(store)) as db, db:
+            db.execute('CREATE TABLE vectors (id TEXT PRIMARY KEY)')
+            db.execute('CREATE TABLE semantic_settings (id INTEGER PRIMARY KEY)')
+        self.memory('rebuild')
+        self.assertEqual(self.memory('recall', data='registration')['results'][0]['id'], key)
+        with contextlib.closing(sqlite3.connect(store)) as db:
+            rows = db.execute("SELECT name FROM sqlite_master WHERE name IN ('vectors', 'semantic_settings')").fetchall()
+        self.assertEqual(rows, [])
+
+    def test_unsafe_file_source_is_refused(self):
         self.install()
         self.memory('save', data=self.record(ref='../project.md'), expect=2)
-        with self.assertRaises(EmbeddingError):
-            Ollama(11434, 'remote:cloud', DIGEST)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "name": "agent-harness-toolkit",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "python": ">=3.11",
   "platform_targets": ["windows-x64", "windows-arm64", "macos-arm64", "macos-x64"],
   "runtime_dependencies": [],
   "distribution": "starter-zip",
   "public_release": true,
-  "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance", "skill-presets", "source-linked-memory", "optional-local-semantic", "local-project-checks", "walkthrough"],
+  "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance", "skill-presets", "source-linked-memory", "local-project-checks", "walkthrough"],
   "compatibility": {"source_tests": "see-ci-for-release-commit", "windows_runtime": "see-native-powershell-ci", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "see-release-verification", "human_acceptance": "pending"}
 }

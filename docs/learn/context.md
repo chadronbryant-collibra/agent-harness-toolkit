@@ -16,7 +16,7 @@ Claude checks for Python and previews the setup. If Python is missing, ask Claud
 
 If Claude can't find it, check the folder shown in the session. Ask **“Use workspace-memory to check if my preference was saved in this folder.”** If Claude can't run the helper, it should tell you that memory is unavailable for that session. Your notes stay in the work folder you chose. They are readable files on your machine, so keep private or sensitive information out of this storage.
 
-To update an existing 1.2.0 setup, open the new download and ask **“Update the toolkit memory tools in my existing work folder. Show me the preview and keep my notes and edits.”** The setup recognizes the original 1.2.0 helper files and keeps edited copies for review.
+To update an existing 1.2.0 or 1.2.1 setup, open the new download and ask **“Update the toolkit memory tools in my existing work folder. Show me the preview and keep my notes and edits.”** The setup recognizes the original helper files and keeps edited copies for review.
 
 ## Keep project context and references
 
@@ -26,12 +26,4 @@ Use the [context starter](../../templates/context) to keep a short project updat
 
 When you save a decision with a source link, Claude can check whether the source changed before relying on it. Plain context files work even when searchable memory is off. [Check a connection](connections.md)
 
-## Try search by meaning
-
-Try this after ordinary memory works. Search by meaning helps when the words you remember are different from the ones you saved. It needs Ollama and a small downloaded model on your computer.
-
-> Help me try search by meaning in this work folder. Check whether Ollama is running locally with cloud features off. Guide me through anything missing, then let me choose the first note to include.
-
-Claude can check the local runtime and identify the model. If it needs a download, it should show you [where to get Ollama](https://ollama.com/download) and which model to download. It should confirm which notes you want included before preparing them for search. Try a harmless example. Save **“Registration opens after the venue confirms capacity”** and add just that note. Then ask **“When can people sign up?”** Claude should locate the note and tell you which search it used.
-
-You can say **“Turn off search by meaning for this folder.”** Keyword search still works when meaning search is off or the model is unavailable. [Exact commands and local setup](../reference/memory.md#search-by-meaning)
+[Memory commands, 1.1 import, and recovery](../reference/memory.md)
