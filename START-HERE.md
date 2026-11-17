@@ -1,59 +1,26 @@
-# Let's set up your workspace
+# Set up your folder
 
-**Start with one useful task. Add more when you need it.**
+Extract the ZIP. Open the extracted folder in a local assistant session, such as Claude Code. With browser chat you can read the example and draft a plan from attached notes. Use a session with access to the folder to create files and resume from them.
 
-You do not need to understand the toolkit's files or choose every feature today. Claude will help you decide what fits your work and check what your computer needs.
+> Help me set up the toolkit for one task. Follow START-HERE.md. Show me the folder you’ll use and the files you propose to add or edit. Then walk me through the workshop example.
 
-[Explore the guides](docs/README.md) · [See a first-task example](examples/notes.md)
+## Try it first
 
-## ① Open the toolkit with Claude
+Copy [examples/workshop](examples/workshop/README.md) to a new folder of your choice, including its two instruction files. Open the copied folder as the workspace and follow its README. This is the quickest way to try both sessions.
 
-**Using Claude Code?** Open the extracted toolkit folder there.
+## Start a new workspace
 
-**Using Claude chat?** Attach this file and ask Claude to help you move into a local session that can read the toolkit folder. Chat can explain the steps; a local session is needed to configure files on your computer.
+1. Pick a new or empty folder and name one job you do often.
+2. Preview the copy of the workshop and the wording you want for your workspace instructions. After review, copy the starter files into that folder. Adapt its `AGENTS.md` to your work and keep the client adapter with it.
+3. Open that folder as a new session. Run the example before adding real sources.
 
-Keep the extracted folder in a place you plan to keep, such as **Documents → Agent Toolkit**.
+## Add to an existing folder
 
-## ② Copy this message
+1. Read the folder’s current instructions and check whether the example destination exists.
+2. Preview adding the workshop under a new `workshop/` folder. Keep existing files and settings. If the destination exists, show the conflict and ask where the practice copy belongs.
+3. If you want the resume practice available for other work, review a proposed patch to the existing instructions. Recheck those files immediately before applying the agreed patch. Keep any edits made since the preview and review a fresh diff if needed.
+4. Open the workshop folder as the session workspace to run the exercise. Then return to your normal workspace.
 
-```text
-Help me set up this toolkit for my work. Follow START-HERE.md.
+The assistant should show you the final folder and what it added or edited. Keep the workspace and its notes together. To update the practice material, unpack the new version beside it and compare the files. To remove it, review the copied folder and move it out of the workspace once you’ve saved any work you want to keep. Review any separately applied instruction edits before removing those lines.
 
-Ask what I want help with and check what is already set up on my
-computer. Recommend a simple starting point that fits my budget.
-
-Explain each choice in plain language. Preserve my current settings
-and show me what will change before applying it. Do not enable paid
-runs, connections or memory until we have agreed what I want.
-
-Finish by helping me complete the included first-task example.
-```
-
-## ③ Choose a starting point
-
-| Start with… | Add later if it helps… |
-| :--- | :--- |
-| One type of work you do often | More workflows and specialist agents |
-| Clear instructions for how Claude should help | Optional reminders at the start and end of work |
-| A model choice and spending limit | More advanced model comparisons |
-| The included fictional project | Your own approved sources and tools |
-
-Memory is optional. If you choose it, first agree what may be saved, where it will live, and how you will remove it. The included memory store saves readable text on your computer; it does not provide its own encryption.
-
-## ④ Complete a first task
-
-Ask Claude to copy [the fictional project notes](examples/notes.md) into the new workspace, preserving any existing file. Then say:
-
-> Turn these notes into a short action plan. Keep the notes unchanged, show the source for each action, and mark anything we still need to decide.
-
-You should be able to explain what Claude changed, see what it checked, and know how to ask for the next task.
-
-**Ready for real work?** Open [Everyday use](docs/everyday-use.md).
-
----
-
-### For Claude: how to guide this setup
-
-Read [the setup playbook](docs/reference/setup-for-claude.md) before changing files. Use its checks and commands yourself; explain the choices and results to the person setting up the kit. Do not ask them to decode command output or read every technical guide.
-
-If you can only see this file, help the person open the full folder in a suitable local Claude session before attempting setup.
+[Everyday use](docs/everyday-use.md) · [Optional Python setup and advanced features](docs/reference/setup-for-claude.md)

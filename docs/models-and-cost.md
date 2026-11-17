@@ -37,13 +37,15 @@ The launcher is an optional way to start a limited paid task. It supports accoun
 
 **A toolkit limit is not an account-wide spending cap.** Other conversations and services can incur costs outside its records. Check your provider's account controls as well.
 
+Run `toolkit.py doctor` to see which bundled commands can spend. Local commands, including `reserve` and `reconcile`, only update or inspect files. The metered launcher previews its allowance and covered file tools before execution, checks the workspace budget again when reserving, and rejects requested tools outside that coverage. You can narrow the file tools with the optional `tools` list in a task. Any added service needs its own billing scope, limit, and usage evidence before use.
+
 ## Make sense of a spending report
 
 - **Reserved:** money set aside for a task that may still be running or needs a final check.
 - **Observed:** a cost returned by the provider or supported by a usage record.
 - **Unknown:** no reliable final amount is available yet. It must not be presented as zero.
 
-If a run ends without a reliable cost, its reserved allowance remains counted until the outcome is checked. Ending a local process does not undo charges already incurred. A reservation keeps its original month, even if the task finishes later.
+If a run ends without a reliable cost, its reserved allowance remains counted until the outcome is checked. Ending a local process does not undo charges already incurred. A reservation keeps its original month, even if the task finishes later. If the provider reports a cost above the reservation, the toolkit records the full cost and flags it in the run receipt.
 
 ## Review the choice over time
 

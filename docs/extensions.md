@@ -39,7 +39,7 @@ The setup guide covers the small amount of software the toolkit itself needs. Yo
 ## Add a capability in four steps
 
 1. **Choose it.** Explain the job it should do and confirm the source is trustworthy.
-2. **Review access.** Confirm the account, service, information and actions it will be allowed to use.
+2. **Review access.** Confirm the account, service, allowed actions, and whether each tool is local, included in a subscription, or billed by use. For billed use, check the applicable limit and where to verify charges before running it. Keep tools with unknown billing outside paid runs.
 3. **Try it.** Start a fresh Claude session and complete one small, harmless task.
 4. **Keep or remove it.** Record the working version and how to update, disconnect or uninstall it.
 

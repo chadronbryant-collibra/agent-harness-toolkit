@@ -202,6 +202,33 @@ class Core(unittest.TestCase):
         self.assertIn('--restricted', result['command'])
         self.assertFalse(t.ledger(self.root)['reservations'])
 
+    def test_launcher_rejects_uncovered_tools_and_over_budget_preview(self):
+        cfg = t.config(self.root)
+        cfg['models']['standard']['verified'] = True
+        cfg['profile']['billing'] = 'metered'
+        self.cfg(models=cfg['models'], profile=cfg['profile'])
+        external = t.task_create(self.root, dict(self.task(), tools=['ExternalConnector']))
+        local = t.task_create(self.root, dict(self.task(), tools=['Read']))
+        with patch('subprocess.run', side_effect=AssertionError('no call')):
+            with self.assertRaisesRegex(t.HarnessError, 'outside-metered-budget'):
+                t.launch(self.root, external['id'], .5, True, sys.executable)
+            with self.assertRaisesRegex(t.HarnessError, 'task-budget-exceeded'):
+                t.launch(self.root, local['id'], 2, executable=sys.executable)
+            preview = t.launch(self.root, local['id'], .5, executable=sys.executable)
+        self.assertEqual(preview['covered_tools'], ['Read'])
+        self.assertFalse(t.ledger(self.root)['reservations'])
+
+    def test_launcher_accounts_for_invalid_and_over_budget_cost(self):
+        for reported, observed, over in [('invalid', None, None), (0.8, 0.8, True)]:
+            _, receipt = self.fake_launch(
+                'import json; print(json.dumps('
+                + repr({'is_error': False, 'total_cost_usd': reported}) + '))'
+            )
+            self.assertEqual(receipt['actual_usd'], observed)
+            self.assertIs(receipt['over_reservation'], over)
+        charges = [row['charged_micro_usd'] for row in t.ledger(self.root)['reservations'].values()]
+        self.assertCountEqual(charges, [500000, 800000])
+
     def test_unsupported_launcher_no_reservation(self):
         cfg = t.config(self.root); cfg['models']['standard']['verified'] = True
         cfg['profile']['billing'] = 'metered'; self.cfg(models=cfg['models'], profile=cfg['profile'])
@@ -229,7 +256,7 @@ class Core(unittest.TestCase):
             if '--print' in command:
                 return real_popen([sys.executable, '-c', program], **kwargs)
             return real_popen(command, **kwargs)
-        help_text = '--print --max-budget-usd --restricted --safe-mode --strict-mcp-config --no-session-persistence --permission-mode --allowedTools --tools --effort'
+        help_text = '--print --max-budget-usd --restricted --safe-mode --strict-mcp-config --no-session-persistence --permission-mode --allowedTools --tools --effort --mcp-config'
         def fake_run(command, **kwargs):
             if '--help' in command:
                 return subprocess.CompletedProcess([], 0, help_text, '')
@@ -292,6 +319,11 @@ class Package(unittest.TestCase):
                 z.extractall(unpack)
             result = subprocess.run([sys.executable, str(unpack / 'toolkit.py'), 'self-check'], capture_output=True)
             self.assertEqual(result.returncode, 0)
+            workshop = unpack / 'examples/workshop'
+            self.assertEqual((workshop / 'CLAUDE.md').read_text().strip(), '@AGENTS.md')
+            self.assertEqual((workshop / 'notes.md').read_bytes(), (ROOT / 'examples/notes.md').read_bytes())
+            for name in ('README.md', 'AGENTS.md'):
+                self.assertTrue((workshop / name).is_file())
 
     def test_archive_traversal_refused(self):
         spec = importlib.util.spec_from_file_location('package', ROOT / 'scripts/package.py')

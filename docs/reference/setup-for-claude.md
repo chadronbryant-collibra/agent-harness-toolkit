@@ -1,6 +1,6 @@
-# Setup playbook for Claude
+# Optional Python setup for Claude
 
-**Use this page to guide the setup. Keep the person's experience conversational.** Explain decisions and results in plain language; run necessary checks yourself when the session has permission and the tools to do so.
+**Use this page when someone chooses the optional Python toolkit.** Start with the file-based workshop for a first session. Explain decisions and results in plain language; run necessary checks yourself when the session has permission and the tools to do so.
 
 [← First-time setup](../../START-HERE.md) · [Command reference](commands.md) · [Configuration explained](configuration.md)
 
