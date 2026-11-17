@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "agent-harness-toolkit",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "python": ">=3.11",
   "platform_targets": ["windows-x64", "windows-arm64", "macos-arm64", "macos-x64"],
   "runtime_dependencies": [],

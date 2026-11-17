@@ -46,11 +46,15 @@ MEMORY_121 = {
     '.harness/memory-tools/toolkit.py': 'd7b0db9bd3ad17d298140b418f44ce504445aa512cbcaae375bf7cbfcb68bd19',
     '.claude/skills/workspace-memory/SKILL.md': '413ce0b971f67ca957fb184a8b5d7b6b8fe27c7c38685e3c68ff63be54db7d21',
 }
+MEMORY_122 = {
+    '.claude/skills/workspace-memory/SKILL.md': '45a55814d46ac0fc2b585edcc4159bf7eb616ef5ee9c7c93de119f3ee8e28e87',
+    '.claude/rules/toolkit-memory.md': '731584fb0ca871ab606ead6f7236ef54d928b6776ad9c6bea41010a8dd42c737',
+}
 RETIRED_MEMORY_FILE = '.harness/memory-tools/memory_semantic.py'
 
 
 def shipped_memory_file(path, digest):
-    return digest in (MEMORY_120.get(path), MEMORY_121.get(path))
+    return digest in (MEMORY_120.get(path), MEMORY_121.get(path), MEMORY_122.get(path))
 
 
 def preset_bytes(preset, source):

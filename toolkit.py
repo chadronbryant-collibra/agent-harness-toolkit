@@ -23,7 +23,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '1.2.2'
+VERSION = '1.2.3'
 
 
 class HarnessError(ValueError):

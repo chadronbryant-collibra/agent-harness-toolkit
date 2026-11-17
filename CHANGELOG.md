@@ -1,5 +1,9 @@
 # What changed
 
+## 1.2.3
+
+Find saved decisions using the words you remember. Claude checks the source and can try one related search if the first results leave the question unanswered. The walkthrough shows how to save alternate words and find a decision in a fresh session. Setup can update untouched 1.2.2 memory instructions while keeping your notes and edits.
+
 ## 1.2.2
 
 Remove the external model integration, associated setup guidance, and model downloads from CI. Keep local keyword memory and support an in-place update of the earlier 1.2 helpers.
