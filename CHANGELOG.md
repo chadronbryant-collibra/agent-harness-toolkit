@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-Add a self-contained workshop, setup choices for new and existing folders, and a fresh-session exercise that checks the current source against saved progress. Keep the Python helper available for optional tools and settings.
+Add a self-contained workshop, setup choices for new and existing folders, and a fresh-session exercise that checks the current source against saved progress. Keep the Python helper available for optional tools and settings. Metered previews check available budget, show covered tools, and report observed overruns.
 
 ## Guide refresh | October 30, 2026
 

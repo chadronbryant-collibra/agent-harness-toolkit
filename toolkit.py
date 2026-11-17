@@ -287,23 +287,27 @@ def assess(cfg, task, today=None):
             'trust_grants_permission': False, 'route': selected, 'executes': False}
 
 
-def reserve(root, amount, period=None):
-    cfg = config(root)
-    period = period or now()[:7]
-    if period != now()[:7]:
-        raise HarnessError('stale-budget-period')
+def check_allowance(cfg, records, amount, period):
     units = money(amount)
     if units <= 0 or units > money(cfg['budgets']['task_usd']):
         raise HarnessError('task-budget-exceeded')
+    active = sum(row['status'] == 'reserved' for row in records.values())
+    if active >= cfg['budgets']['max_concurrency']:
+        raise HarnessError('concurrency-limit')
+    used = sum(row['charged_micro_usd'] for row in records.values() if row['period'] == period)
+    if used + units > money(cfg['budgets']['month_usd']):
+        raise HarnessError('monthly-budget-exceeded')
+    return units
+
+
+def reserve(root, amount, period=None):
+    period = period or now()[:7]
     with lock(root):
+        if period != now()[:7]:
+            raise HarnessError('stale-budget-period')
         data = ledger(root)
         records = data['reservations']
-        used = sum(r['charged_micro_usd'] for r in records.values() if r['period'] == period)
-        active = sum(r['status'] == 'reserved' for r in records.values())
-        if active >= cfg['budgets']['max_concurrency']:
-            raise HarnessError('concurrency-limit')
-        if used + units > money(cfg['budgets']['month_usd']):
-            raise HarnessError('monthly-budget-exceeded')
+        units = check_allowance(config(root), records, amount, period)
         key = str(uuid.uuid4())
         records[key] = {'period': period, 'reserved_micro_usd': units,
                         'charged_micro_usd': units, 'status': 'reserved', 'actual_usd': None,
@@ -512,8 +516,16 @@ def launch(root, key, amount, approve=False, executable=None):
         raise HarnessError('launcher-effect-not-supported')
     if selected['status'] != 'ready' or cfg['profile']['billing'] != 'metered':
         raise HarnessError('verified-model-and-metered-profile-required')
-    money(amount)
-    tools = 'Read,Glob,Grep' + (',Edit,Write' if selected['effect'] == 'local-write' else '')
+    allowed = ['Read', 'Glob', 'Grep']
+    if selected['effect'] == 'local-write':
+        allowed.extend(['Edit', 'Write'])
+    requested = row['task'].get('tools', allowed)
+    if (not isinstance(requested, list) or not requested
+            or any(tool not in allowed for tool in requested)):
+        raise HarnessError('launcher-tool-outside-metered-budget')
+    tools = ','.join(dict.fromkeys(requested))
+    units = check_allowance(cfg, ledger(root)['reservations'], amount, now()[:7])
+    amount = units / 1_000_000
     exe = executable or shutil.which('claude')
     if not exe or not Path(exe).is_absolute(): raise HarnessError('claude-not-found')
     command = [exe, '--print', '--model', selected['model'], '--effort', selected['effort'],
@@ -522,11 +534,12 @@ def launch(root, key, amount, approve=False, executable=None):
                '--allowedTools', tools, '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}']
     if not approve:
         return {'status': 'preview', 'command': command, 'reservation_usd': amount,
+                'billing': 'metered', 'currency': 'USD', 'covered_tools': list(dict.fromkeys(requested)),
                 'shell_tools': False, 'note': 'Client file confinement is not an OS sandbox.'}
     if row['status'] not in ('planned', 'blocked'): raise HarnessError('task-not-launchable')
     capability = subprocess.run([exe, '--help'], capture_output=True, timeout=15, text=True)
     required = ['--print', '--max-budget-usd', '--restricted', '--safe-mode', '--strict-mcp-config',
-                '--no-session-persistence', '--permission-mode', '--allowedTools', '--tools', '--effort']
+                '--no-session-persistence', '--permission-mode', '--allowedTools', '--tools', '--effort', '--mcp-config']
     if capability.returncode or any(flag not in capability.stdout for flag in required):
         raise HarnessError('unsupported-claude-client')
     marker = state_path(root, 'active-run')
@@ -558,11 +571,15 @@ def launch(root, key, amount, approve=False, executable=None):
         except (ValueError, UnicodeError): result = {}
         if not isinstance(result, dict): result = {}
         actual = result.get('total_cost_usd')
-        if actual is not None: money(actual)
+        try:
+            actual_units = money(actual) if actual is not None else None
+        except HarnessError:
+            actual, actual_units = None, None
         reconcile(root, reservation['reservation'], actual)
         receipt = {'task': key, 'pid': child.pid, 'process_exit': child.returncode,
                    'status': stopped or ('executor-returned' if child.returncode == 0 and not result.get('is_error', True) else 'executor-failed'),
                    'actual_usd': actual, 'measurement': 'provider-reported' if actual is not None else 'unavailable',
+                   'over_reservation': None if actual_units is None else actual_units > units,
                    'artifact_acceptance': 'pending-independent-verification', 'output_sha256': digest(raw), 'at': now()}
         atomic_write(state_path(root, 'runs/' + key + '.json'), encode(receipt))
         (marker / 'owner.json').unlink(); marker.rmdir()
@@ -602,7 +619,12 @@ def main(argv=None):
     try:
         root = Path(args.workspace).absolute()
         cmd = args.command
-        if cmd == 'doctor': result = doctor()
+        if cmd == 'doctor':
+            result = doctor()
+            result['command_billing'] = {
+                name: ('metered-on-execute' if name == 'run' else 'local')
+                for name in sub.choices
+            }
         elif cmd == 'self-check': result = self_check()
         elif cmd == 'init': result = initialize(root, args.apply_plan)
         elif cmd == 'uninstall': result = uninstall(root)
