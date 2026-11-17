@@ -40,18 +40,22 @@ def main():
             data = json.dumps({'kind': 'decision', 'title': title, 'note': note,
                                'source': {'type': 'user', 'ref': 'fictional example'}})
             records.append((call(installed, workspace, 'save', data=data)['id'], question))
-        call(installed, workspace, 'semantic-configure', '--model', MODEL, '--digest', model['digest'])
+        assert call(installed, workspace, 'semantic-check')['status'] == 'model-ready-to-configure'
+        setup = call(installed, workspace, 'semantic-configure', '--use-by-default')
+        assert setup['digest'] == model['digest'] and setup['use_by_default']
+        assert call(installed, workspace, 'semantic-check')['status'] == 'choose-notes'
         call(installed, workspace, 'semantic-build', '--all')
+        assert call(installed, workspace, 'semantic-check')['indexed'] == len(records)
         for key, question in records:
             if question is None:
                 continue
-            keyword = call(installed, workspace, 'recall', data=question)
-            hybrid = call(installed, workspace, 'recall', '--semantic', data=question)
+            keyword = call(installed, workspace, 'recall', '--keyword-only', data=question)
+            hybrid = call(installed, workspace, 'recall', data=question)
             assert all(row['id'] != key for row in keyword['results']), keyword
             assert hybrid['mode'] == 'hybrid' and hybrid['results'][0]['id'] == key, hybrid
         key = records[0][0]
         call(installed, workspace, 'forget', key, '--version', '1')
-        after = call(installed, workspace, 'recall', '--semantic', data=records[0][1])
+        after = call(installed, workspace, 'recall', data=records[0][1])
         assert all(row['id'] != key for row in after['results']), after
         print('Real local embeddings returned both paraphrased decisions first and excluded a forgotten record.')
 

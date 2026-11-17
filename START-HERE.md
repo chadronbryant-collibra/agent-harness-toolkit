@@ -1,6 +1,6 @@
 # Set up your assistant for one task
 
-Extract the toolkit and open that folder in Claude Code. Choose a folder where you work. Claude can help you add to an existing setup or start a new folder.
+Extract the toolkit. In the Claude desktop app, choose **Code**, start a **Local** session, and open the extracted download. Tell Claude which folder you want to use for your work. Reopen that work folder when you come back. [Desktop setup guide](https://code.claude.com/docs/en/desktop)
 
 > Help me set up one thing from START-HERE.md. Use the files already included, show me where they’ll go, and help me try it.
 

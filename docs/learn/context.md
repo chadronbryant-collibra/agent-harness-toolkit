@@ -1,25 +1,37 @@
-# Keep something useful and find it again
+# Save a preference and find it again
 
-Open the extracted toolkit in Claude Code and try this prompt.
+## Open the download in Claude
 
-> Help me set up memory for this folder. Show me what you'll add. Then help me save one preference and find it in a fresh session.
+1. Download the toolkit ZIP and extract it. In the Claude desktop app, open the **Code** tab and start a **Local** session. Choose the folder you just extracted. [Claude Code desktop guide](https://code.claude.com/docs/en/desktop)
+2. Tell Claude where you want to keep your own work. You can choose an existing folder or create a folder called **My projects** for practice.
 
-1. Choose the folder where you want the memory. Claude shows the files it will copy and keeps your existing instructions. The helper needs Python 3.11 or later.
-2. Say “Remember that I like project briefs to start with blockers.” Claude shows the saved preference and where it lives.
-3. Open a fresh Claude Code session in the same folder. Say “Use workspace-memory. How do I like my project briefs?”
+> Help me add memory to my **My projects** folder. Follow START-HERE.md from this download and show me what you’ll add.
 
-For a decision, save a note with its source. On recall, Claude opens the source through your approved access and can flag a change or a missing source. Save or correct only what you ask Claude to keep. The toolkit's memory is plaintext on your machine. Use it for material suitable for that storage and keep the directory out of shared repositories and inappropriate backups.
+Claude checks for Python and previews the setup. If Python is missing, ask Claude to guide you through the [official Python download](https://www.python.org/downloads/) before continuing. If Claude asks permission to run a command, check that it describes the toolkit helper and the folder you chose. At the end, ask Claude to give you the name and location of your work folder.
+
+## Save something and come back
+
+1. Start a new Local session and open **My projects**, the work folder you chose. Say **“Remember that I like project briefs to start with blockers.”** Wait for Claude to say it saved the preference in that folder.
+2. Start another new Local session in **My projects** and ask **“How do I like my project briefs?”** Claude should answer “Put blockers first” and tell you it came from your saved preference.
+
+If Claude can't find it, check the folder shown in the session. Ask **“Use workspace-memory to check if my preference was saved in this folder.”** If Claude can't run the helper, it should tell you that memory is unavailable for that session. Your notes stay in the work folder you chose. They are readable files on your machine, so keep private or sensitive information out of this storage.
+
+To update an existing 1.2.0 setup, open the new download and ask **“Update the toolkit memory tools in my existing work folder. Show me the preview and keep my notes and edits.”** The setup recognizes the original 1.2.0 helper files and keeps edited copies for review.
 
 ## Keep project context and references
 
-Use the [context starter](../../templates/context) to keep a short project update, next action, and links. Keep a few sources in [the reference index](../../templates/reference-library/SOURCES.md). You can place those files in your workspace or version the reference library in its own repository. Give each source a useful name, what it answers, and a review date.
+Use the [context starter](../../templates/context) to keep a short project update, next action, and links. Keep a few sources in [the reference index](../../templates/reference-library/SOURCES.md). You can place those files in your workspace or version the reference library in its own repository. Give each source a name, what it answers, and a review date.
 
 > Read the project context and open the source it points to. What should I do next?
 
-Open a fresh session to try it. Plain context files work even when searchable memory is off. The included brief and source-finding skills can use the same files. An existing Google Workspace or GitHub connection can open a source when the current account has access. [Check a connection](connections.md)
+When you save a decision with a source link, Claude can check whether the source changed before relying on it. Plain context files work even when searchable memory is off. [Check a connection](connections.md)
 
-## Add search by meaning when it helps
+## Try search by meaning
 
-Use keyword search for names, phrases, and saved aliases. If you often describe a topic in different words, ask Claude to help you enable [search by meaning](../reference/memory.md#search-by-meaning). You choose the local model and which saved items to index. Keyword recall stays available while the option is off or unavailable.
+Try this after ordinary memory works. Search by meaning helps when the words you remember are different from the ones you saved. It needs Ollama and a small downloaded model on your computer.
 
-[Exact memory commands, import and recovery](../reference/memory.md)
+> Help me try search by meaning in this work folder. Check whether Ollama is running locally with cloud features off. Guide me through anything missing, then let me choose the first note to include.
+
+Claude can check the local runtime and identify the model. If it needs a download, it should show you [where to get Ollama](https://ollama.com/download) and which model to download. It should confirm which notes you want included before preparing them for search. Try a harmless example. Save **“Registration opens after the venue confirms capacity”** and add just that note. Then ask **“When can people sign up?”** Claude should locate the note and tell you which search it used.
+
+You can say **“Turn off search by meaning for this folder.”** Keyword search still works when meaning search is off or the model is unavailable. [Exact commands and local setup](../reference/memory.md#search-by-meaning)

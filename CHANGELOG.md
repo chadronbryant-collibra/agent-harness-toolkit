@@ -1,5 +1,9 @@
 # What changed
 
+## 1.2.1
+
+Clarify which folder to open in Claude, use the memory skill for everyday questions, and guide local meaning search without requiring an API response or a model fingerprint from the user. The memory preset previews updates to untouched 1.2.0 helper files.
+
 ## 1.2.0
 
 Add a workspace Memory Harness with source pointers, keyword and optional local meaning search, correction history, forgetting, export, rebuild, and previewed import of 1.1 notes. Add an installable Claude memory skill and simplify the README, setup, and public walkthrough.

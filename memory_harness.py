@@ -14,7 +14,7 @@ from urllib.parse import urlsplit
 import uuid
 
 import toolkit
-from memory_semantic import EmbeddingError, Ollama, bounded_vector, cosine
+from memory_semantic import DEFAULT_MODEL, EmbeddingError, Ollama, bounded_vector, cosine
 
 
 KINDS = ('preference', 'decision', 'progress', 'reference')
@@ -132,7 +132,7 @@ def open_read(path):
 @contextlib.contextmanager
 def database(root, *, write=False):
     if not setup_state(root):
-        raise MemoryError('set-up-memory-in-this-workspace-first')
+        raise MemoryError('memory-not-set-up-here: open the folder where you installed memory or follow START-HERE.md')
     path = toolkit.safe_path(root, DB)
     if not write:
         if not path.is_file():
@@ -245,16 +245,17 @@ def semantic_rows(db, cfg, question, limit):
     return [row for score, row in ranked[:limit] if score >= 0.30], status
 
 
-def recall(root, query, limit, semantic=False):
+def recall(root, query, limit, semantic=None):
     query = text(query, 500)
     with database(root) as db:
         if db is None:
             return {'mode': 'keyword', 'results': [], 'semantic_status': 'disabled'}
         matches = keyword_rows(db, query, limit)
         related, state = [], 'not-selected'
-        if semantic:
+        settings = get_semantic_settings(db) if semantic is not False else None
+        if semantic is True or (settings and settings.get('use_by_default', False)):
             try:
-                related, state = semantic_rows(db, get_semantic_settings(db), query, limit)
+                related, state = semantic_rows(db, settings, query, limit)
             except EmbeddingError:
                 state = 'unavailable'
         ranked = {}
@@ -335,7 +336,7 @@ def legacy_plan(root):
 
 def migrate(root, expected):
     if not setup_state(root):
-        raise MemoryError('set-up-memory-in-this-workspace-first')
+        raise MemoryError('memory-not-set-up-here: open the folder where you installed memory or follow START-HERE.md')
     items, plan = legacy_plan(root)
     if expected is None:
         return plan
@@ -363,15 +364,57 @@ def migrate(root, expected):
     return {'imported': imported, 'skipped': skipped, 'legacy_preserved': True}
 
 
-def semantic_configure(root, port, model, digest):
-    runtime = Ollama(port, model, digest)
-    runtime.verify()
+def semantic_check(root, port=None, model=None):
+    if not setup_state(root):
+        return {'status': 'memory-not-set-up-here',
+                'next_step': 'Open the folder where you installed memory. See START-HERE.md to set it up.'}
+    with database(root) as db:
+        configured = get_semantic_settings(db)
+        count = db.execute('SELECT count(*) FROM vectors').fetchone()[0] if db else 0
+    selected = Ollama(port if port is not None else (configured or {}).get('port', 11434),
+                      model if model is not None else (configured or {}).get('model', DEFAULT_MODEL))
+    pinned = configured and selected.port == configured['port'] and selected.model == configured['model']
+    if pinned:
+        selected = Ollama.from_settings(configured)
+    try:
+        selected.verify()
+    except EmbeddingError as error:
+        reason = str(error)
+        next_step = {
+            'local-model-changed': 'The installed model changed. Review it, configure it again, and rebuild search for your selected notes.',
+            'local-model-not-installed': 'Open Ollama in local-only mode and download the displayed local model.',
+        }.get(reason, 'Start Ollama in local-only mode on this machine and check again.')
+        return {'status': reason, 'model': selected.model, 'next_step': next_step}
+    if not pinned:
+        next_step = 'Choose whether to enable this local model for this folder. No notes have been indexed.'
+        state = 'model-ready-to-configure'
+    elif count == 0:
+        next_step = 'Choose one or more saved notes for search by meaning.'
+        state = 'choose-notes'
+    else:
+        next_step = 'Ask your question in this folder. Keyword search remains available.'
+        state = 'ready'
+    return {'status': state, 'model': selected.model, 'indexed': count if pinned else 0,
+            'use_by_default': bool(pinned and configured.get('use_by_default', False)),
+            'next_step': next_step}
+
+
+def semantic_configure(root, port, model, digest, default=None):
+    if not setup_state(root):
+        raise MemoryError('memory-not-set-up-here: open your work folder first')
+    discovered = Ollama(port, model, digest).verify()
+    runtime = Ollama(port, model, discovered)
     with database(root, write=True) as db:
         previous = get_semantic_settings(db)
-        if previous != runtime.settings:
+        same_model = previous and Ollama.from_settings(previous).settings == runtime.settings
+        if not same_model:
             db.execute('DELETE FROM vectors')
-        db.execute('INSERT OR REPLACE INTO semantic_settings VALUES(1, ?)', (packed(runtime.settings),))
-    return {'semantic': 'configured', 'indexed': 'not-yet-built', 'model': model, 'digest': digest}
+        if default is None:
+            default = bool(previous and previous.get('use_by_default', False))
+        settings = dict(runtime.settings, use_by_default=default)
+        db.execute('INSERT OR REPLACE INTO semantic_settings VALUES(1, ?)', (packed(settings),))
+    return {'semantic': 'configured', 'indexed': 'kept' if same_model else 'not-yet-built',
+            'model': model, 'digest': discovered, 'use_by_default': default}
 
 
 def semantic_build(root, selected, all_records=False):
@@ -454,16 +497,24 @@ def parse_args(argv):
         if name == 'current':
             item.add_argument('--kind', choices=KINDS)
         if name == 'recall':
-            item.add_argument('--semantic', action='store_true')
+            mode = item.add_mutually_exclusive_group()
+            mode.add_argument('--semantic', action='store_true', default=None)
+            mode.add_argument('--keyword-only', action='store_false', dest='semantic')
     sub.add_parser('export').add_argument('file')
     sub.add_parser('import-legacy').add_argument('--apply-plan')
     build = sub.add_parser('semantic-build')
     build.add_argument('--id', action='append', default=[])
     build.add_argument('--all', action='store_true')
+    check = sub.add_parser('semantic-check')
+    check.add_argument('--port', type=int)
+    check.add_argument('--model')
     item = sub.add_parser('semantic-configure')
     item.add_argument('--port', type=int, default=11434)
-    item.add_argument('--model', required=True)
-    item.add_argument('--digest', required=True)
+    item.add_argument('--model', default=DEFAULT_MODEL)
+    item.add_argument('--digest')
+    choice = item.add_mutually_exclusive_group()
+    choice.add_argument('--use-by-default', action='store_true', default=None)
+    choice.add_argument('--manual', action='store_false', dest='use_by_default')
     return parser.parse_args(argv)
 
 
@@ -486,8 +537,10 @@ def main(argv=None):
             result = export(root, args.file)
         elif cmd == 'import-legacy':
             result = migrate(root, args.apply_plan)
+        elif cmd == 'semantic-check':
+            result = semantic_check(root, args.port, args.model)
         elif cmd == 'semantic-configure':
-            result = semantic_configure(root, args.port, args.model, args.digest)
+            result = semantic_configure(root, args.port, args.model, args.digest, args.use_by_default)
         elif cmd == 'semantic-build':
             result = semantic_build(root, args.id, args.all)
         else:

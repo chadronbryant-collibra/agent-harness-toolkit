@@ -1,5 +1,6 @@
 import contextlib
 import http.server
+from unittest.mock import patch
 import json
 import os
 from pathlib import Path
@@ -11,6 +12,7 @@ import threading
 import unittest
 import uuid
 
+import kit
 import toolkit
 from memory_semantic import EmbeddingError, Ollama
 
@@ -177,6 +179,57 @@ class WorkspaceMemory(unittest.TestCase):
             self.assertEqual(self.memory('status')['semantic_indexed'], 0)
             self.memory('semantic-off')
             self.assertEqual(self.memory('status')['semantic'], 'disabled')
+
+    def test_guided_meaning_setup_discovers_model_and_remembers_choice(self):
+        self.assertEqual(self.call('memory_harness.py', 'semantic-check')['status'], 'memory-not-set-up-here')
+        self.install()
+        (self.root / 'project.md').write_text('Registration plan', encoding='utf-8')
+        key = self.memory('save', data=self.record())['id']
+        with fake_ollama() as service:
+            port = str(service.server_port)
+            before = self.memory('semantic-check', '--port', port, '--model', MODEL)
+            self.assertEqual(before['status'], 'model-ready-to-configure')
+            self.assertEqual(service.received, [])
+            result = self.memory('semantic-configure', '--port', port, '--model', MODEL, '--use-by-default')
+            self.assertEqual(result['digest'], DIGEST)
+            self.assertEqual(self.memory('semantic-check')['status'], 'choose-notes')
+            self.assertEqual(service.received, [])
+            self.memory('semantic-build', '--id', key)
+            ready = self.memory('semantic-check')
+            self.assertEqual(ready['indexed'], 1)
+            self.assertTrue(ready['use_by_default'])
+            self.assertEqual(self.memory('recall', data='When can people sign up?')['results'][0]['id'], key)
+            previous = list(service.received)
+            self.assertEqual(self.memory('recall', '--keyword-only', data='When can people sign up?')['results'], [])
+            self.assertEqual(service.received, previous)
+            service.digest = 'e' * 64
+            self.assertEqual(self.memory('semantic-check')['status'], 'local-model-changed')
+            service.digest = DIGEST
+            self.memory('semantic-configure', '--port', port, '--model', MODEL, '--manual')
+            self.assertFalse(self.memory('semantic-check')['use_by_default'])
+            self.assertEqual(self.memory('semantic-check')['indexed'], 1)
+            self.assertEqual(self.memory('recall', data='When can people sign up?')['mode'], 'keyword')
+
+    def test_upgrade_keeps_saved_records_and_rejects_an_edited_helper(self):
+        self.install()
+        (self.root / 'project.md').write_text('Registration plan', encoding='utf-8')
+        key = self.memory('save', data=self.record())['id']
+        relative = '.harness/memory-tools/memory_harness.py'
+        target = self.root / relative
+        original = b'Previous release sample'
+        target.write_bytes(original)
+        with patch.dict(kit.MEMORY_120, {relative: toolkit.digest(original)}):
+            plan = kit.add(self.root, 'memory-harness')
+            self.assertEqual(next(row for row in plan['files'] if row['path'] == relative)['status'], 'update')
+            target.write_bytes(b'User edit after preview')
+            with self.assertRaisesRegex(toolkit.HarnessError, 'setup-plan-changed'):
+                kit.add(self.root, 'memory-harness', plan['plan_sha256'])
+            self.assertEqual(target.read_bytes(), b'User edit after preview')
+            target.write_bytes(original)
+            result = kit.add(self.root, 'memory-harness', plan['plan_sha256'])
+        self.assertEqual(result['files_updated'], [relative])
+        self.assertEqual(self.memory('show', key)['note'], 'Registration opens after venue confirmation.')
+        self.assertTrue((self.root / '.claude/rules/toolkit-memory.md').is_file())
 
     def test_unsafe_sources_and_cloud_model_are_refused(self):
         self.install()
