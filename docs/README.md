@@ -28,8 +28,8 @@
 
 You can skip these during ordinary use. They explain exact commands, configuration choices and the recorded checks.
 
-- [Setup playbook for Claude](reference/setup-for-claude.md)
+- [Optional Python setup for Claude](reference/setup-for-claude.md)
 - [Command reference](reference/commands.md)
 - [Configuration explained](reference/configuration.md)
-- [Recorded checks](validation-2026-10-30.md)
+- [Checks for the original preview](validation-2026-10-30.md)
 - [Contributor instructions](../AGENTS.md)

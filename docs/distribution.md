@@ -6,11 +6,11 @@
 
 ## What to send
 
-Send the current toolkit ZIP, or a link to the current source download, with this message:
+Send the versioned ZIP linked from the [toolkit README](../README.md), with this message:
 
-> Unpack this folder and open START-HERE.md with Claude. It will help you choose what you need, check your computer, and walk you through a first task. You do not need to understand every file before starting.
+> Unpack this folder and open START-HERE.md with Claude. Choose a folder, try the workshop example, and reopen it in a fresh session to pick up your progress.
 
-The GitHub repository is publicly viewable. Its older preview release remains a dated snapshot; the main-branch download includes the refreshed guides. Public visibility does not establish an open-source license or permission to redistribute third-party material. Confirm the applicable ownership and distribution terms before broader reuse.
+GitHub keeps the original colleague preview as a dated snapshot. Use the 1.0 release for the current walkthrough. Check the terms included with the release before adapting or redistributing files.
 
 ## What stays yours
 
