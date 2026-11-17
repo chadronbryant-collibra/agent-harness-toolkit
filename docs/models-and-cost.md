@@ -37,7 +37,7 @@ The launcher is an optional way to start a limited paid task. It supports accoun
 
 **A toolkit limit is not an account-wide spending cap.** Other conversations and services can incur costs outside its records. Check your provider's account controls as well.
 
-Run `toolkit.py doctor` to see which bundled commands can spend. Local commands, including `reserve`, `reconcile`, and the optional `kit.py` helpers, only update or inspect files. Using a skill through Claude uses your normal session. The metered launcher previews its allowance and covered file tools before execution, checks the workspace budget again when reserving, and rejects requested tools outside that coverage. You can narrow the file tools with the optional `tools` list in a task. Any added service needs its own billing scope, limit, and usage evidence before use.
+Run `toolkit.py doctor` to see which bundled commands can spend. Local commands, including `reserve`, `reconcile`, and the optional `kit.py` helpers, only update or inspect files. Using a skill through Claude uses your normal session. Memory keywords and optional local embeddings make no Claude calls. Meaning search uses the separately installed local model. The metered launcher previews its allowance and covered file tools before execution, checks the workspace budget again when reserving, and rejects requested tools outside that coverage. You can narrow the file tools with the optional `tools` list in a task. Any added service needs its own billing scope, limit, and usage evidence before use.
 
 ## Make sense of a spending report
 

@@ -18,5 +18,5 @@ function show(name, animate) {
 for (const button of buttons) {
   button.addEventListener('click', () => show(button.dataset.example, true));
 }
-show('skill', false);
+show('context', false);
 selection.hidden = false;

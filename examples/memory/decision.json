@@ -1,0 +1,7 @@
+{
+  "kind": "decision",
+  "title": "When registration opens",
+  "note": "Registration will open after the venue confirms capacity.",
+  "source": {"type": "file", "ref": "project.md"},
+  "aliases": ["registration schedule"]
+}

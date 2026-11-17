@@ -1,5 +1,9 @@
 # What changed
 
+## 1.2.0
+
+Add a workspace Memory Harness with source pointers, keyword and optional local meaning search, correction history, forgetting, export, rebuild, and previewed import of 1.1 notes. Add an installable Claude memory skill and simplify the README, setup, and public walkthrough.
+
 ## 1.1.0 | November 17, 2026
 
 Add outcome-based setup, four reusable skills, context and reference starters, guided connection checks, and optional local setup and project scripts. Move the workshop to optional practice. Add a public walkthrough with three selectable examples.
