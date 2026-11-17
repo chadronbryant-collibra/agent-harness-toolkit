@@ -11,7 +11,7 @@ python3 kit.py --workspace "/path/to/work" add memory-harness
 python3 kit.py --workspace "/path/to/work" add memory-harness --apply-plan PLAN_SHA256
 ```
 
-The preset installs the workspace-memory skill, its local scripts and settings, and an ignore rule under `.harness/`. It doesn't create a database until a memory operation needs one. It preserves existing files. If your target already has a different file at a planned path, review that conflict before making the smallest needed change. Use the separate `context` and `references` presets if you want starter files for either. Review the exact paths before sharing or backing up the workspace.
+The preset installs the workspace-memory skill, a project rule to use memory when relevant, the local scripts and settings, and an ignore rule under `.harness/`. It doesn't create a database until a memory operation needs one. It preserves existing files. The same preview updates untouched 1.2.0 helper files and keeps the existing store. Review any file conflict before applying a change. Use the separate `context` and `references` presets if you want starter files for either. Review the exact paths before sharing or backing up the workspace.
 
 From the workspace, the command prefix is `python3 .harness/memory-tools/memory_harness.py`. On Windows use the installed Python 3.11+ command, such as `py -3`. Status checks what is present. A fresh Claude Code session verifies skill discovery. Claude needs permission to run the local Python helper when using the skill. Try the documented prompts after reopening that folder.
 
@@ -48,15 +48,19 @@ Leave the original 1.1 store in the same workspace under `.harness/memory.sqlite
 
 ## Search by meaning
 
-The optional adapter uses a local Ollama process and a downloaded embedding model. Check the [vendor setup](https://docs.ollama.com/faq) for your system, and choose whether to install it. Run it on your machine bound to `127.0.0.1` with Ollama cloud features disabled. Keep this service accessible only on the local machine. The toolkit connects directly to loopback and checks the selected model's full digest and local GGUF format. The API cannot attest the process settings. Use an instance you control with cloud disabled.
-
-For a small English-language starter model, review [all-minilm](https://ollama.com/library/all-minilm) and download it separately. A model download uses the internet and disk space. The toolkit does not install Ollama or download models. Once installed, inspect the model's full digest in the local `GET /api/tags` response. Supply the exact local name, such as `all-minilm:latest`, and its full digest.
+Start with the [guided setup](../learn/context.md#try-search-by-meaning). Use the following for troubleshooting or if you prefer commands. Run them from the work folder with the installed memory command prefix.
 
 ```text
-semantic-configure --model all-minilm:latest --digest FULL_DIGEST
+semantic-check
+semantic-configure --use-by-default
 semantic-build --id RECORD_ID
-recall --semantic
-semantic-off
+recall
 ```
 
-Use the same memory command prefix. Repeat `--id` to select several items, or use `--all` only if you intend to index all active notes in that workspace. Index building sends the selected note titles and text to that local model. Hybrid recall sends the query to that model and combines candidates with keyword results. The adapter never crawls a reference folder or downloads source files. The index supports up to 200 selected notes. New or corrected notes need an index refresh before meaning search can find their new content. Forget removes its matching vector. `semantic-off` removes the saved settings and vectors. If the model is unavailable or changed, the query falls back to keyword search and reports why. Local indexing and search make no Claude calls. Using the results in a normal Claude conversation follows the account's billing.
+`semantic-check` reports what's missing and the next step. It reads runtime metadata without sending saved notes. Use [Ollama's local-only setup](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) with the service bound to the local machine. The toolkit cannot verify the process's cloud settings through its API. Use a local instance you control and separate it from any shared instance.
+
+The default model is [all-minilm:latest](https://ollama.com/library/all-minilm). Download it separately with `ollama pull all-minilm:latest` when you choose to use it. `semantic-configure` reads the local model fingerprint and records it for future checks. A different supported model or port can be selected with `--model` or `--port`. Model installation and updates can use the internet and disk space.
+
+Repeat `--id` to include several saved notes. Use `--all` only if you intend to include every active note in this folder. Building replaces the prior selection and sends the chosen note titles and text to the local model. It handles up to 200 selected notes. After a change or correction, rebuild with the records you want included. A model change requires reviewing the new model and rebuilding.
+
+With `--use-by-default`, a normal recall uses meaning search in this folder when ready. Use `recall --keyword-only` for a single keyword lookup or `semantic-off` to remove the meaning-search settings and index. Existing configurations without a default choice still use meaning search only with `recall --semantic`. Local search makes no Claude calls. Using the results in Claude follows your normal session billing.

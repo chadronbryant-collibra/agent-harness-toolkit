@@ -23,11 +23,21 @@ PRESETS = {
     'memory-harness': {
         '.harness/memory-harness.json': 'templates/memory/settings.json',
         '.harness/.gitignore': 'templates/memory/ignore',
-        '.harness/memory-tools/memory_harness.py': 'memory_harness.py',
         '.harness/memory-tools/memory_semantic.py': 'memory_semantic.py',
+        '.harness/memory-tools/memory_harness.py': 'memory_harness.py',
         '.harness/memory-tools/toolkit.py': 'toolkit.py',
         '.claude/skills/workspace-memory/SKILL.md': 'skills/workspace-memory/SKILL.md',
+        '.claude/rules/toolkit-memory.md': 'templates/memory/remember-in-this-folder.md',
     },
+}
+
+
+# These digests identify the untouched files in the verified 1.2.0 ZIP.
+MEMORY_120 = {
+    '.harness/memory-tools/memory_harness.py': '7220a235181965770647bbaa978a4efd1d1ce0454cea34f6559d7f23b4c39034',
+    '.harness/memory-tools/memory_semantic.py': '0f44d05fc1acc51fc39f07631661c54fe0042db8a98f26961859b4e0f548c9ce',
+    '.harness/memory-tools/toolkit.py': '9d9e550e7b0bb4d59bf6b2778b0e3b523a8e2f58ca84439d5f359a35103d4c8f',
+    '.claude/skills/workspace-memory/SKILL.md': '70cc98562cc0a33ab20f23cb4d2c8091755bad8b03168dd05fa4595144d4c1d4',
 }
 
 
@@ -46,9 +56,19 @@ def prepare(root, preset):
         target = toolkit.safe_path(root, destination)
         body = preset_bytes(preset, source)
         status = 'add'
+        original = None
         if target.exists():
-            status = 'same' if target.is_file() and target.stat().st_size == len(body) and target.read_bytes() == body else 'conflict'
-        plan['files'].append({'path': destination, 'status': status, 'sha256': toolkit.digest(body)})
+            status = 'conflict'
+            if target.is_file() and target.stat().st_size <= 1_000_000:
+                original = toolkit.digest(target.read_bytes())
+                if original == toolkit.digest(body):
+                    status = 'same'
+                elif preset == 'memory-harness' and original == MEMORY_120.get(destination):
+                    status = 'update'
+        item = {'path': destination, 'status': status, 'sha256': toolkit.digest(body)}
+        if status == 'update':
+            item['previous_sha256'] = original
+        plan['files'].append(item)
     return plan
 
 
@@ -66,7 +86,7 @@ def add(root, preset, binding=None):
     with toolkit.lock(root):
         if prepare(root, preset) != plan:
             raise toolkit.HarnessError('setup-plan-changed')
-        children = []
+        children, updated = [], []
         for row in plan['files']:
             if row['status'] == 'same':
                 continue
@@ -75,10 +95,17 @@ def add(root, preset, binding=None):
             if toolkit.digest(body) != row['sha256']:
                 raise toolkit.HarnessError('preset-source-changed')
             target.parent.mkdir(parents=True, exist_ok=True)
-            with target.open('xb') as stream:
-                stream.write(body)
-            children.append(row['path'])
-    return {'status': 'copied', 'files_added': children, 'client_loaded': 'not-checked'}
+            if row['status'] == 'update':
+                if toolkit.digest(target.read_bytes()) != row['previous_sha256']:
+                    raise toolkit.HarnessError('setup-plan-changed')
+                toolkit.atomic_write(target, body)
+                updated.append(row['path'])
+            else:
+                with target.open('xb') as stream:
+                    stream.write(body)
+                children.append(row['path'])
+    return {'status': 'copied', 'files_added': children, 'files_updated': updated,
+            'client_loaded': 'not-checked'}
 
 
 def project_check(root, tool, relative_file, expected):

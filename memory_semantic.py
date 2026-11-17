@@ -6,6 +6,9 @@ import math
 import re
 
 
+DEFAULT_MODEL = "all-minilm:latest"
+
+
 class EmbeddingError(ValueError):
     pass
 
@@ -26,11 +29,11 @@ def cosine(left, right):
 
 
 class Ollama:
-    def __init__(self, port, model, digest):
+    def __init__(self, port, model, digest=None):
         if (type(port) is not int or not 1024 <= port <= 65535
                 or not isinstance(model, str) or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}:[a-zA-Z0-9._-]{1,40}', model)
                 or 'cloud' in model.casefold()
-                or not isinstance(digest, str) or not re.fullmatch(r'[a-f0-9]{64}', digest)):
+                or (digest is not None and (not isinstance(digest, str) or not re.fullmatch(r'[a-f0-9]{64}', digest)))):
             raise EmbeddingError('choose-a-local-model-and-full-digest')
         self.port = port
         self.model = model
@@ -39,9 +42,12 @@ class Ollama:
 
     @classmethod
     def from_settings(cls, settings):
-        if not isinstance(settings, dict) or set(settings) != {'port', 'model', 'digest'}:
+        required = {'port', 'model', 'digest'}
+        if (not isinstance(settings, dict) or not required <= set(settings)
+                or set(settings) - (required | {'use_by_default'}) or settings['digest'] is None
+                or type(settings.get('use_by_default', False)) is not bool):
             raise EmbeddingError('invalid-local-semantic-settings')
-        return cls(**settings)
+        return cls(**{key: settings[key] for key in required})
 
     def request(self, path, value=None):
         # An explicit loopback socket avoids remote endpoints, proxies and redirects.
@@ -73,14 +79,20 @@ class Ollama:
         if not isinstance(rows, list):
             raise EmbeddingError('invalid-local-model-list')
         for row in rows:
-            if not isinstance(row, dict) or row.get('name') != self.model or row.get('digest') != self.digest:
+            if not isinstance(row, dict) or row.get('name') != self.model:
                 continue
-            details = row.get('details')
-            if isinstance(details, dict) and details.get('format') == 'gguf' and not (row.get('remote_host') or row.get('remote_model')):
-                return
-        raise EmbeddingError('local-model-missing-or-changed')
+            details, digest = row.get('details'), row.get('digest')
+            if (isinstance(details, dict) and details.get('format') == 'gguf'
+                    and not (row.get('remote_host') or row.get('remote_model'))
+                    and isinstance(digest, str) and re.fullmatch(r'[a-f0-9]{64}', digest)):
+                if self.digest is not None and self.digest != digest:
+                    raise EmbeddingError('local-model-changed')
+                return digest
+        raise EmbeddingError('local-model-not-installed')
 
     def embed(self, texts):
+        if self.digest is None:
+            raise EmbeddingError('configure-local-semantic-search-first')
         self.verify()
         result = self.request('/api/embed', {'model': self.model, 'input': texts, 'truncate': False})
         rows = result.get('embeddings')

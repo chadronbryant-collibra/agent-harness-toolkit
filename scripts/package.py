@@ -15,6 +15,7 @@ FILES = (
     'skills/workspace-memory/SKILL.md',
     'templates/memory/settings.json',
     'templates/memory/ignore',
+    'templates/memory/remember-in-this-folder.md',
     'examples/memory/project.md',
     'examples/memory/decision.json',
     'tests/test_memory_harness.py',
