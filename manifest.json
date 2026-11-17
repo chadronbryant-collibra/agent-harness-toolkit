@@ -8,5 +8,5 @@
   "distribution": "starter-zip",
   "public_release": true,
   "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance"],
-  "compatibility": {"source_tests": "see-ci-for-release-commit", "windows_runtime": "see-native-powershell-ci", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "pending", "human_acceptance": "pending"}
+  "compatibility": {"source_tests": "see-ci-for-release-commit", "windows_runtime": "see-native-powershell-ci", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "macos-claude-code-2.1.326-workshop-passed", "human_acceptance": "pending"}
 }
