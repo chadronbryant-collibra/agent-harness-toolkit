@@ -1,5 +1,9 @@
 # What changed
 
+## 1.0.0
+
+Add a self-contained workshop, setup choices for new and existing folders, and a fresh-session exercise that checks the current source against saved progress. Keep the Python helper available for optional tools and settings.
+
 ## Guide refresh | October 30, 2026
 
 Reworked the setup page, every guide, working-instruction template, agent role and starter lesson in plain language. Added copyable prompts, a guide directory, configuration explanations and a separate command reference for Claude and maintainers. The home-page download now points to the source with the refreshed guides. No runtime behavior or permissions changed.

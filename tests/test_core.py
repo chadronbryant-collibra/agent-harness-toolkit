@@ -292,6 +292,11 @@ class Package(unittest.TestCase):
                 z.extractall(unpack)
             result = subprocess.run([sys.executable, str(unpack / 'toolkit.py'), 'self-check'], capture_output=True)
             self.assertEqual(result.returncode, 0)
+            workshop = unpack / 'examples/workshop'
+            self.assertEqual((workshop / 'CLAUDE.md').read_text().strip(), '@AGENTS.md')
+            self.assertEqual((workshop / 'notes.md').read_bytes(), (ROOT / 'examples/notes.md').read_bytes())
+            for name in ('README.md', 'AGENTS.md'):
+                self.assertTrue((workshop / name).is_file())
 
     def test_archive_traversal_refused(self):
         spec = importlib.util.spec_from_file_location('package', ROOT / 'scripts/package.py')

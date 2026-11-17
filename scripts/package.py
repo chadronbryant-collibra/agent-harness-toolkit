@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build/verify an explicit-file, deterministic private colleague ZIP."""
+"""Build/verify an explicit-file, deterministic toolkit ZIP."""
 import argparse
 import hashlib
 import json
@@ -8,17 +8,61 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-FILES = ['.gitignore', '.github/workflows/test.yml', 'AGENTS.md', 'README.md', 'START-HERE.md', 'CHANGELOG.md', 'manifest.json',
-         'toolkit.py', 'bootstrap.ps1', 'bootstrap.sh']
-TREES = ['config', 'templates', 'docs', 'skills', 'knowledge', 'examples', 'references', 'tests', 'scripts']
+FILES = (
+    '.github/workflows/test.yml',
+    '.gitignore',
+    'AGENTS.md',
+    'CHANGELOG.md',
+    'README.md',
+    'START-HERE.md',
+    'bootstrap.ps1',
+    'bootstrap.sh',
+    'config/defaults.json',
+    'config/model-catalog.example.json',
+    'docs/README.md',
+    'docs/acceptance.md',
+    'docs/architecture.md',
+    'docs/distribution.md',
+    'docs/everyday-use.md',
+    'docs/extensions.md',
+    'docs/hooks.md',
+    'docs/maintenance.md',
+    'docs/memory-and-references.md',
+    'docs/models-and-cost.md',
+    'docs/reference/commands.md',
+    'docs/reference/configuration.md',
+    'docs/reference/setup-for-claude.md',
+    'docs/security.md',
+    'docs/validation-2026-10-30.md',
+    'examples/notes.md',
+    'examples/task.json',
+    'examples/workshop/AGENTS.md',
+    'examples/workshop/CLAUDE.md',
+    'examples/workshop/README.md',
+    'examples/workshop/notes.md',
+    'knowledge/starter-lessons.md',
+    'manifest.json',
+    'references/catalog.json',
+    'scripts/package.py',
+    'skills/harness/SKILL.md',
+    'templates/CLAUDE.md',
+    'templates/WORKSPACE.md',
+    'templates/agents/implementer.md',
+    'templates/agents/reviewer.md',
+    'templates/agents/scout.md',
+    'tests/test_core.py',
+    'toolkit.py',
+)
 
 
 def source_files():
     paths = [ROOT / name for name in FILES]
-    for tree in TREES:
-        paths.extend(p for p in (ROOT / tree).rglob('*') if p.is_file() and p.suffix in ('.py', '.md', '.json'))
-    for p in paths:
-        if p.is_symlink() or (p.relative_to(ROOT).as_posix() not in ('.gitignore', '.github/workflows/test.yml') and any(part.startswith('.') for part in p.relative_to(ROOT).parts)):
+    license_path = ROOT / 'LICENSE'
+    if license_path.exists() or license_path.is_symlink():
+        paths.append(license_path)
+    for path in paths:
+        relative_parents = [parent for parent in path.parents if parent != ROOT and parent.is_relative_to(ROOT)]
+        if not path.is_file() or path.is_symlink() or any(parent.is_symlink() for parent in relative_parents):
             raise ValueError('unsafe-source')
     return sorted(paths)
 
@@ -47,7 +91,7 @@ def verify(path):
 
 
 def build(output):
-    output = Path(output).absolute()
+    output = Path(output).resolve()
     if output.is_relative_to(ROOT) or output.exists():
         raise ValueError('output-must-be-new-and-outside-source')
     data = {p.relative_to(ROOT).as_posix(): p.read_bytes() for p in source_files()}
