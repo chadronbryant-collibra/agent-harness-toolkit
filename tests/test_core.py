@@ -304,6 +304,57 @@ class Core(unittest.TestCase):
         self.assertEqual(sorted([first.returncode, second.returncode]), [0, 2])
 
 
+class StarterPresets(unittest.TestCase):
+    def call(self, root, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / 'kit.py'), '--workspace', str(root), *args],
+            capture_output=True, text=True, timeout=15,
+        )
+
+    def test_preview_and_apply_preserve_existing_skills(self):
+        with tempfile.TemporaryDirectory(prefix='starter path with spaces ') as temp:
+            root = Path(temp).resolve()
+            preview = self.call(root, 'add', 'write-a-brief')
+            self.assertEqual(preview.returncode, 0, preview.stderr)
+            self.assertEqual(list(root.iterdir()), [])
+            plan = json.loads(preview.stdout)
+            target = root / plan['files'][0]['path']
+            applied = self.call(root, 'add', 'write-a-brief', '--apply-plan', plan['plan_sha256'])
+            self.assertEqual(applied.returncode, 0, applied.stderr)
+            self.assertEqual(target.read_bytes(), (ROOT / 'skills/write-a-brief/SKILL.md').read_bytes())
+            target.write_bytes(b'Owner edit')
+            conflict = json.loads(self.call(root, 'add', 'write-a-brief').stdout)
+            self.assertEqual(conflict['files'][0]['status'], 'conflict')
+            refused = self.call(root, 'add', 'write-a-brief', '--apply-plan', conflict['plan_sha256'])
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertEqual(target.read_bytes(), b'Owner edit')
+
+    def test_opt_in_memory_preset_does_not_create_store(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            plan = json.loads(self.call(root, 'add', 'memory').stdout)
+            self.assertFalse((root / '.harness').exists())
+            applied = self.call(root, 'add', 'memory', '--apply-plan', plan['plan_sha256'])
+            self.assertEqual(applied.returncode, 0, applied.stderr)
+            status = json.loads(self.call(root, 'memory-status').stdout)
+            self.assertTrue(status['enabled'])
+            self.assertFalse(status['store_exists'])
+
+    def test_project_checks_report_match_without_exposing_configuration(self):
+        for tool, filename, expected in (
+            ('clasp', 'clasp-project.json', 'fictional-script-id'),
+            ('gcloud', 'gcloud-project.ini', 'example-project'),
+        ):
+            with self.subTest(tool=tool):
+                file = 'examples/advanced/' + filename
+                matched = self.call(ROOT, 'check-project', tool, '--file', file, '--expected', expected)
+                self.assertEqual(matched.returncode, 0, matched.stderr)
+                self.assertEqual(json.loads(matched.stdout)['network_calls'], 0)
+                mismatch = self.call(ROOT, 'check-project', tool, '--file', file, '--expected', 'wrong-id')
+                self.assertEqual(mismatch.returncode, 1, mismatch.stderr)
+                self.assertNotIn(expected, mismatch.stdout)
+
+
 class Package(unittest.TestCase):
     def test_deterministic_archive_and_roundtrip(self):
         spec = importlib.util.spec_from_file_location('package', ROOT / 'scripts/package.py')
@@ -316,6 +367,9 @@ class Package(unittest.TestCase):
             with zipfile.ZipFile(first) as z:
                 self.assertFalse(any(n.startswith('.harness/') or n.startswith('.git/') for n in z.namelist()))
                 self.assertIn('.harness/', z.read('.gitignore').decode())
+                for needed in ('kit.py', 'docs/index.html', 'docs/walkthrough.js', 'docs/learn/skills.md',
+                               'skills/write-a-brief/SKILL.md', 'templates/context/PROJECT.md'):
+                    self.assertIn(needed, z.namelist())
                 z.extractall(unpack)
             result = subprocess.run([sys.executable, str(unpack / 'toolkit.py'), 'self-check'], capture_output=True)
             self.assertEqual(result.returncode, 0)

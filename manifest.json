@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "name": "agent-harness-toolkit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "python": ">=3.11",
   "platform_targets": ["windows-x64", "windows-arm64", "macos-arm64", "macos-x64"],
   "runtime_dependencies": [],
   "distribution": "starter-zip",
   "public_release": true,
-  "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance"],
-  "compatibility": {"source_tests": "see-ci-for-release-commit", "windows_runtime": "see-native-powershell-ci", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "macos-claude-code-2.1.326-workshop-passed", "human_acceptance": "pending"}
+  "modules": ["setup", "routing", "budget", "agents", "memory", "references", "improvement", "hooks", "maintenance", "skill-presets", "local-project-checks", "walkthrough"],
+  "compatibility": {"source_tests": "see-ci-for-release-commit", "windows_runtime": "see-native-powershell-ci", "macos_runtime": "core-and-shell-bootstrap-passed", "claude_fresh_load": "see-release-verification", "human_acceptance": "pending"}
 }

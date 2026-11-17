@@ -1,5 +1,9 @@
 # What changed
 
+## 1.1.0 | November 17, 2026
+
+Add outcome-based setup, four reusable skills, context and reference starters, guided connection checks, and optional local setup and project scripts. Move the workshop to optional practice. Add a public walkthrough with three selectable examples.
+
 ## 1.0.0
 
 Add a self-contained workshop, setup choices for new and existing folders, and a fresh-session exercise that checks the current source against saved progress. Keep the Python helper available for optional tools and settings. Metered previews check available budget, show covered tools, and report observed overruns.

@@ -1,9 +1,9 @@
 # Agent Harness Toolkit
 
-Set up a folder your AI assistant can work in and return to later. Start with a fictional workshop, turn its notes into an action plan, then open a new session and pick up where you left off.
+Set up an assistant that can use your references, remember what you choose to save, and repeat the work you do often.
 
-[Download the 1.0 ZIP](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.0.0/agent-harness-toolkit-1.0.0.zip) · [Set up your folder](START-HERE.md) · [See the workshop example](examples/workshop/README.md)
+[Choose what to set up](https://chadronbryant-collibra.github.io/agent-harness-toolkit/) · [Download the toolkit](https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.1.0/agent-harness-toolkit-1.1.0.zip) · [Start with Claude](START-HERE.md)
 
-Unzip the download and open `START-HERE.md` with an assistant that can read and edit local files. Try the example, start a workspace of your own, or add the toolkit to a folder you already use. The practice run needs no Python, GitHub account, or additional connections.
+Download the ZIP, open it in a local Claude Code session, and ask: **“Help me set up one thing from START-HERE.md.”** Pick a ready-made skill, add context and references, get a second opinion, or check a GitHub or Google Workspace connection.
 
-When the example works, use the same setup for one job you do often. [Explore the guides](docs/README.md) to add a skill, command-line tool, or reference library.
+Start with your own task. [An optional practice example](examples/workshop/README.md) is included. The [advanced guide](docs/learn/advanced.md) has ready-made commands for local memory, Apps Script, and Google Cloud.
