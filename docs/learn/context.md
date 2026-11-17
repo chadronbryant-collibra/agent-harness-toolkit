@@ -16,7 +16,13 @@ Claude checks for Python and previews the setup. If Python is missing, ask Claud
 
 If Claude can't find it, check the folder shown in the session. Ask **“Use workspace-memory to check if my preference was saved in this folder.”** If Claude can't run the helper, it should tell you that memory is unavailable for that session. Your notes stay in the work folder you chose. They are readable files on your machine, so keep private or sensitive information out of this storage.
 
-To update an existing 1.2.0 or 1.2.1 setup, open the new download and ask **“Update the toolkit memory tools in my existing work folder. Show me the preview and keep my notes and edits.”** The setup recognizes the original helper files and keeps edited copies for review.
+To update an existing 1.2 setup, open the new download and ask **“Update the toolkit memory tools in my existing work folder. Show me the preview and keep my notes and edits.”** The setup recognizes the original helper files and keeps edited copies for review.
+
+## Find a decision when you remember different words
+
+Ask in your own words. For example, “When can people sign up?” Claude can search once for your terms and try once with related words such as “registration.” It checks the selected source before giving you a date or citing a decision. If neither search answers your question, it tells you what is missing.
+
+When saving a note, you can say “I also call this signups.” The toolkit can save those alternate words with the note so local keyword search can find it later. Claude's retry uses the current conversation. The lookup itself runs locally.
 
 ## Keep project context and references
 
