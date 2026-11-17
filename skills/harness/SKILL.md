@@ -5,7 +5,7 @@ description: Help someone set up and maintain this toolkit, choose the right hel
 
 # Help the person do the next useful thing
 
-Read START-HERE.md in the downloaded toolkit folder for setup. Use its docs/README.md to find the relevant guide. The toolkit folder may be separate from the current workspace. Ask for its location if needed; do not assume installing this skill copied the guides. Load the few pages the task needs, rather than the whole repository.
+Read START-HERE.md in the downloaded toolkit folder for setup. For setup, choose the outcome in START-HERE.md and follow the linked guide. Use the supplied presets before writing new files. The toolkit folder may be separate from the current workspace. Ask for its location if needed; do not assume installing this skill copied the guides. Load the few pages the task needs, rather than the whole repository.
 
 ## For a task
 

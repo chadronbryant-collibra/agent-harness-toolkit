@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pick a task for Claude Code and get started with ready-made skills, context, memory, and connection guides.">
+  <title>Agent Harness Toolkit</title>
+  <link rel="stylesheet" href="walkthrough.css">
+  <script src="walkthrough.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-row">
+      <strong>Agent Harness Toolkit</strong>
+      <nav aria-label="Main">
+        <a href="#choose">Choose a setup</a>
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit">GitHub</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <h1>Set up your assistant for the work you do</h1>
+          <p class="intro">Start with one task. Add a ready-made skill, give Claude sources you trust, or check a connection you already use.</p>
+          <div class="actions">
+            <a class="button primary" href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases/download/v1.1.0/agent-harness-toolkit-1.1.0.zip">Download the toolkit</a>
+            <a class="button" href="#walkthrough">See how it works</a>
+          </div>
+          <p class="caption">Open the extracted folder in Claude Code and start with <code>START-HERE.md</code>.</p>
+        </div>
+        <figure class="example">
+          <figcaption>Example in Claude Code</figcaption>
+          <p class="prompt">“Use /write-a-brief on these notes. Put blockers first.”</p>
+          <div class="response">
+            <strong>Project brief</strong>
+            <dl>
+              <div><dt>Blocker</dt><dd>Confirm who will review the draft.</dd></div>
+              <div><dt>Next step</dt><dd>Send the draft to the reviewer once assigned.</dd></div>
+            </dl>
+            <p class="caption">Source: planning notes, review section</p>
+          </div>
+        </figure>
+      </div>
+    </section>
+    <section class="shell section" id="walkthrough">
+      <h2>See three ways to start</h2>
+      <div class="walkthrough">
+        <div class="selection" aria-label="Walkthrough example" hidden>
+          <button type="button" data-example="skill" aria-pressed="true">Add a skill</button>
+          <button type="button" data-example="context" aria-pressed="false">Pick up later</button>
+          <button type="button" data-example="connection" aria-pressed="false">Check a connection</button>
+        </div>
+        <article data-story="skill">
+          <h3>Draft the same kind of brief whenever you need it</h3>
+          <ol>
+            <li><strong>Choose.</strong> Pick the included <code>write-a-brief</code> skill.</li>
+            <li><strong>Try.</strong> Ask Claude to use it on a few notes you already have.</li>
+            <li><strong>Reuse.</strong> Open your folder in a new session and ask for the same brief from new notes.</li>
+          </ol>
+          <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/skills.md">Set up a skill <span aria-hidden="true">→</span></a>
+        </article>
+        <article data-story="context">
+          <h3>Come back to the decision and its source</h3>
+          <ol>
+            <li><strong>Keep.</strong> Save the next action and the link behind it in your project context.</li>
+            <li><strong>Return.</strong> In a new session, ask Claude what you should do next.</li>
+            <li><strong>Check.</strong> Claude reads the current source and points out any change since the saved note.</li>
+          </ol>
+          <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/context.md">Set up context and memory <span aria-hidden="true">→</span></a>
+        </article>
+        <article data-story="connection">
+          <h3>Open the right file on the right account</h3>
+          <ol>
+            <li><strong>Choose.</strong> Pick one Google Drive file or GitHub repository.</li>
+            <li><strong>Verify.</strong> Ask Claude which account the connection uses.</li>
+            <li><strong>Read.</strong> Claude opens the item you picked and reports if access works.</li>
+          </ol>
+          <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/connections.md">Check a connection <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+    <section class="shell section" id="choose">
+      <h2>What would you like to do?</h2>
+      <div class="choices">
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/skills.md"><strong>Repeat a task</strong><span>Pick a skill and try it on your work.</span></a>
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/context.md"><strong>Resume a project</strong><span>Save the next step and recall it later.</span></a>
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/context.md#start-a-reference-library"><strong>Find a trusted source</strong><span>Give Claude a small reference library.</span></a>
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/skills.md#get-a-second-opinion"><strong>Get a second opinion</strong><span>Review a plan before making a change.</span></a>
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/connections.md"><strong>Check GitHub or Google Workspace</strong><span>Open one item you select.</span></a>
+        <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/skills.md#make-it-yours"><strong>Build something of your own</strong><span>Adapt a working skill template.</span></a>
+      </div>
+    </section>
+    <aside class="shell section extra">
+      <h2>Use the command line when you need it</h2>
+      <p>The download includes local commands for copying presets, trying searchable memory, and checking the project in an Apps Script or Google Cloud configuration.</p>
+      <p>Local scripts make no Claude calls. Work you ask Claude to do uses the billing for your current session.</p>
+      <a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/docs/learn/advanced.md">Explore advanced tools <span aria-hidden="true">→</span></a>
+    </aside>
+  </main>
+  <footer class="shell footer"><a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/blob/main/START-HERE.md">Setup instructions</a><a href="https://github.com/chadronbryant-collibra/agent-harness-toolkit/releases">Releases</a></footer>
+</body>
+</html>

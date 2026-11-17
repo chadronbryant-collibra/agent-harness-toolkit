@@ -10,7 +10,7 @@ Send the versioned ZIP linked from the [toolkit README](../README.md), with this
 
 > Unpack this folder and open START-HERE.md with Claude. Choose a folder, try the workshop example, and reopen it in a fresh session to pick up your progress.
 
-GitHub keeps the original colleague preview as a dated snapshot. Use the 1.0 release for the current walkthrough. Check the terms included with the release before adapting or redistributing files.
+GitHub keeps the original colleague preview as a dated snapshot. Use the release linked from the README for the current walkthrough. Check the terms included with the release before adapting or redistributing files.
 
 ## What stays yours
 
